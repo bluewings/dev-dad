@@ -1,0 +1,7 @@
+.fixedOuter {
+  position: relative;
+  .fixedInner {
+    position: absolute;
+    width: 100%;
+  }
+}

@@ -1,0 +1,49 @@
+.root {
+  $toggle-size: 50px;
+  $icon-size: 20px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: $toggle-size;
+  height: $toggle-size / 2;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  border: none;
+  .spinner {
+    position: relative;
+    top: ($toggle-size / 2 - $icon-size) / 2;
+    width: $toggle-size;
+    height: $toggle-size;
+    transition: transform 0.67s linear;
+    .sun,
+    .moon {
+      width: $icon-size;
+      height: $icon-size;
+      left: 50%;
+      margin-left: $icon-size * -0.5;
+      position: absolute;
+    }
+    .sun {
+      bottom: 0;
+      animation: spin 30s linear 0s infinite;
+      path {
+        fill: #f6993f;
+      }
+    }
+    .moon {
+      path {
+        fill: #f2d024;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
