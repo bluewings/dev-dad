@@ -87,7 +87,7 @@ Run the above code to create a screenshot of the target element. (click)
     };
     return (
       <div className="sticky" style={{ top: 0 }}>
-        <Scrollama step=".step" offset="0.3" progress>
+        <Scrollama step=".step" offset="0.5" progress>
           {({ index_ }) => (
             <div>
               <Sample
@@ -180,12 +180,17 @@ When the [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) layer is r
 <Context>
   {({ value }) => (
     <div className="sticky" style={{ top: 0 }}>
-      <Scrollama step=".step" offset="0.5" progress debug={true}>
-        {({ stage, stageProgress: progress }) =>
+     <Scrollama step=".step" offset="0.5" progress debug={true}>
+        {({ index_, stage, stageProgress: progress }) =>
           value.screenshot && (
-            <div>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+              justifyContent: 'center',
+            }}>
               <Gimmick
-                show={true}
+                show={index_ > 0}
                 screenshot={value.screenshot}
                 stage={stage}
                 progress={progress}

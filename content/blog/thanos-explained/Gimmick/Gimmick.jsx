@@ -167,14 +167,20 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
 
   const containerStyle = getContainerStyles(progress);
 
-  const marginTop = useMemo(() => {
+  const clonedStyle = useMemo(() => {
     if (stage === OVERLAP_CANVASES) {
-      return (height + 57) * -1 * progress;
+      return {
+        opacity: 1 - progress,
+        marginTop: (height + 57) * -1 * progress,
+      };
     }
     if (stage === ROTATE_AND_FADE_OUT) {
-      return (height + 57) * -1;
+      return {
+        opacity: 0,
+        marginTop: (height + 57) * -1,
+      };
     }
-    return 0;
+    return {};
   }, [stage, progress, height]);
 
   const showScreenshot = !!stage;
@@ -186,17 +192,19 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
       className={`${styles.container} ${!frame ? styles.noFrame : ''}`}
       style={{ display: showScreenshot ? 'block' : 'none' }}
     >
-      <div className="cloned">
-        <div className={styles.single} style={{ marginTop }}>
-          <div ref={screenshotRef} />
-          {stage === MOVE_IMAGE_DATA && progress < 1 && (
-            <div className={styles.shadow} style={{ left: width * progress }} />
-          )}
+      <div className="cloned" style={clonedStyle}>
+        <div className={styles.single}>
+          <div>
+            <div ref={screenshotRef} />
+            {stage === MOVE_IMAGE_DATA && progress < 1 && (
+              <div className={styles.shadow} style={{ left: width * progress }} />
+            )}
+          </div>
         </div>
         <hr />
       </div>
-      {layers && showLayers && (
-        <div>
+      {layers && (
+        <div style={{ visibility: showLayers ? 'visible' : 'hidden ' }}>
           <div className={styles.layers} style={{ ...containerStyle.outer }}>
             <div ref={layersRef} style={{ ...containerStyle.inner, width, height }}>
               {layers.map((e, i) => {

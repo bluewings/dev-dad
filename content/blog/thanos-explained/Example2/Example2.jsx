@@ -25,12 +25,16 @@ function Example2({ children }) {
           };
           return (
             <div className={styles.inner}>
-              <div className={`${styles.sample} ${progress_ > 0 ? styles.invisible : ''}`}>
+              <div className={`${styles.sample} ${progress_ > 0 && screenshot ? styles.invisible : ''}`}>
                 <Sample capture onCapture={handleScreenshotCapture}>
                   <div className={styles.sampleWrap}>{children}</div>
                 </Sample>
               </div>
-              <div className={`${styles.gimmick} ${progress_ > 0 && progress_ !== 1 ? '' : styles.invisible}`}>
+              <div
+                className={`${styles.gimmick} ${
+                  progress_ > 0 && screenshot && progress_ !== 1 ? '' : styles.invisible
+                }`}
+              >
                 <Gimmick
                   show
                   stage="rotate-and-fade-out"
