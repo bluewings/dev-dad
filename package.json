@@ -49,6 +49,7 @@
     "react-helmet": "^5.2.0",
     "react-json-tree": "^0.11.2",
     "react-live": "^1.12.0",
+    "react-textarea-autosize": "^7.1.0",
     "react-typography": "^0.16.18",
     "retoggle": "^0.3.0",
     "scrollama": "^2.0.0",
