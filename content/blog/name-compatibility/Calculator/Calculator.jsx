@@ -140,6 +140,13 @@ function Calculator() {
         .substr(-7),
     );
   };
+  const BASE = '가'.charCodeAt(0);
+
+  Array(200)
+    .fill()
+    .map((e, i) => BASE + i)
+    .map((i) => String.fromCharCode(i))
+    .join('');
 
   return (
     <div className={styles.root}>
