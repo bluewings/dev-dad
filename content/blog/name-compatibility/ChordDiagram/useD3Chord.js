@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import * as d3 from 'd3';
 
 const getGradientId = (d) => `linkGrad-${d.source.index}-${d.target.index}`;
@@ -29,9 +29,6 @@ function useMatrix(inputData) {
       matrix[indexByName[name2]][indexByName[name1]] = score2;
     });
 
-    console.log(JSON.stringify(data, null, 2));
-    console.log(JSON.stringify(matrix));
-
     return { matrix, indexByName, nameByIndex };
   }, [inputData || null]);
 }
@@ -40,6 +37,14 @@ function useD3Chord(cases, width = 600, height = 600) {
   const { matrix: data, nameByIndex } = useMatrix(cases);
 
   const [focus, setFocus] = useState(null);
+
+  const timerId = useRef();
+
+  useEffect(() => {
+    if (timerId.current) {
+      clearTimeout(timerId.current);
+    }
+  }, []);
 
   return useMemo(() => {
     try {
@@ -79,10 +84,15 @@ function useD3Chord(cases, width = 600, height = 600) {
         .attr('fill', (d) => color(d.index))
         .attr('d', arc)
         .on('mouseover', (d) => {
+          if (timerId.current) {
+            clearTimeout(timerId.current);
+          }
           setFocus(d.index);
         })
         .on('mouseout', () => {
-          setFocus(null);
+          timerId.current = setTimeout(() => {
+            setFocus(null);
+          }, 350);
         });
 
       group
