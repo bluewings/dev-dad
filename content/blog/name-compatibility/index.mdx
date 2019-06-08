@@ -6,6 +6,10 @@ excerpt: 내가 30년 전 초등학교 다닐 적에 하던 놀이 중에 아직
 ---
 
 import Calculator from './Calculator';
+import ChordDiagram from './ChordDiagram';
+import Context from '../../components/Context';
+
+[](@context)
 
 내가 30년 전 초등학교 다닐 적에 하던 놀이 중에 아직도 남아있는 것들이 있다. 이름의 획 수를 가지고 궁합을 계산하는 것도 그중의 하나인데, 아들과 함께 코드로 작성해보았다.
 
@@ -13,7 +17,14 @@ import Calculator from './Calculator';
 
 입력 창에 두 개 이상의 이름을 입력하시면 각 이름 간의 궁합을 확인할 수 있습니다. (한글 이름만 가능합니다.)
 
-<Calculator/>
+<Context>
+  {({ setValue }) => {
+    const handleCasesChange = (cases) => {
+      setValue('cases', cases)
+    };
+    return <Calculator onCasesChange={handleCasesChange} />;
+  }}
+</Context>
 
 ---
 
@@ -132,4 +143,40 @@ function getScore(name1, name2) {
 // }
 ```
 
+## Chord Diagram
 
+데이터를 행렬(Matrix)로 변경하면 [D3.js](https://d3js.org/)를 사용하여 [Chord Diagram](https://observablehq.com/collection/@d3/d3-chord)을 그릴 수 있다.
+
+[](@grid-5,overflow=auto)
+
+```json
+  {
+    "name1": "공효진", "name2": "차태현",
+    "score1": 94, "score2": 7
+  },
+  {
+    "name1": "공효진", "name2": "김수현",
+    "score1": 17, "score2": 35
+  },
+  {
+    "name1": "차태현", "name2": "김수현",
+    "score1": 9, "score2": 14
+  }
+]
+```
+
+```json
+[
+  [0, 94, 17],
+  [7, 0, 9],
+  [35, 14, 0]
+]
+```
+
+[](@grid)
+
+<Context>
+  {({ value }) => <ChordDiagram cases={value.cases} />}
+</Context>
+
+[](@gridend)

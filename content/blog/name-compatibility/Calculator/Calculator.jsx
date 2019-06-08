@@ -3,9 +3,9 @@ import React, { useMemo, useState, useEffect } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { interpolateRdYlBu, hsl } from 'd3';
 import Octicon from 'react-octicon';
-import styles from './Calculator.module.scss';
 import { getScore, shuffle } from './util';
 import CalcTable from './CalcTable';
+import styles from './Calculator.module.scss';
 
 const seed = [
   '봉준호',
@@ -44,10 +44,10 @@ const compareScore = (a, b) => {
   return a.score < b.score ? 1 : -1;
 };
 
-function Calculator() {
+function Calculator({ onCasesChange }) {
   const sample = useMemo(() => {
     return shuffle(seed)
-      .slice(0, 5)
+      .slice(0, 8)
       .join(' ');
   }, []);
 
@@ -101,6 +101,9 @@ function Calculator() {
       setSelected(null);
     }
     setQuery('');
+    if (typeof onCasesChange === 'function') {
+      onCasesChange(cases);
+    }
   }, [cases]);
 
   const filtered = useMemo(() => {
