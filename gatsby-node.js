@@ -112,3 +112,18 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     createNodeField({ node, name: `slug`, value: slug });
   }
 };
+
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
+  if (stage === 'build-html') {
+    actions.setWebpackConfig({
+      module: {
+        rules: [
+          {
+            test: /d3-[a-z]+/,
+            use: loaders.null(),
+          },
+        ],
+      },
+    });
+  }
+};

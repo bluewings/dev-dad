@@ -7,7 +7,7 @@ function ChordDiagram({ cases }) {
 
   const container = useRef();
   useEffect(() => {
-    if (container.current) {
+    if (container.current && svg) {
       container.current.innerHTML = '';
       container.current.appendChild(svg.node());
     }

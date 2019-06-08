@@ -123,13 +123,18 @@ function Calculator({ onCasesChange }) {
   };
 
   const getColors = (value) => {
-    const background = interpolateRdYlBu(1 - value / 100);
-    const hsl1 = hsl(background);
-    return {
-      borderLeft: `10px solid ${background}`,
-      background,
-      color: hsl1.l < 0.7 ? '#fff' : '#000',
-    };
+    try {
+      const background = interpolateRdYlBu(1 - value / 100);
+      const hsl1 = hsl(background);
+      return {
+        borderLeft: `10px solid ${background}`,
+        background,
+        color: hsl1.l < 0.7 ? '#fff' : '#000',
+      };
+    } catch (err) {
+      /* ignore */
+    }
+    return {};
   };
 
   const [tick, setTick] = useState('any');
