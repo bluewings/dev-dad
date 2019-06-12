@@ -1,5 +1,28 @@
 @import url('https://fonts.googleapis.com/css?family=Cute+Font&display=swap');
+
+:global(.dark) {
+  .root {
+    .input {
+      button {
+        @apply bg-gray-600 text-gray-100 border-gray-300;
+        &:hover {
+          @apply bg-gray-800 border-gray-400;
+        }
+      }
+    }
+  }
+}
+
 .root {
+  .input {
+    button {
+      @apply bg-gray-300 text-gray-900 leading-normal py-1 px-2 mb-6 border-b-4 border-gray-600 rounded;
+      font-size: 14px;
+      &:hover {
+        @apply bg-gray-200 border-gray-500;
+      }
+    }
+  }
   textarea {
     overflow: hidden;
     resize: none;

@@ -45,6 +45,7 @@
     "ptz-i18n": "^1.0.0",
     "rc-slider": "^8.6.11",
     "react": "^16.8.2",
+    "react-clipboard.js": "^2.0.12",
     "react-dat-gui": "^3.0.0",
     "react-dom": "^16.8.2",
     "react-helmet": "^5.2.0",

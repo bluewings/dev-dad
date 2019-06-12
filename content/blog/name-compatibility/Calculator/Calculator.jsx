@@ -3,6 +3,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { interpolateRdYlBu, hsl } from 'd3';
 import Octicon from 'react-octicon';
+import Clipboard from 'react-clipboard.js';
 import { getScore, shuffle } from './util';
 import CalcTable from './CalcTable';
 import styles from './Calculator.module.scss';
@@ -44,17 +45,25 @@ const compareScore = (a, b) => {
   return a.score < b.score ? 1 : -1;
 };
 
+const inputToURI = (userInput) => {
+  try {
+    return `${location.origin}${location.pathname}?user-input=${encodeURIComponent(userInput)}`;
+  } catch (err) {
+    /* ignore */
+  }
+  return '';
+};
+
 function useUpdateURI() {
   const timerId = useRef();
   const updater = useMemo(
-    () => (userInput, delay = 0) => {
+    () => (nextURI, delay = 0) => {
       if (timerId.current) {
         clearTimeout(timerId.current);
       }
       timerId.current = setTimeout(() => {
         try {
           const currURI = location.href.replace(location.origin, '');
-          const nextURI = `${location.pathname}?user-input=${encodeURIComponent(userInput)}`;
           if (currURI !== nextURI) {
             history.replaceState(null, document.title, nextURI);
           }
@@ -92,18 +101,23 @@ function Calculator({ onCasesChange }) {
   }, []);
 
   const [text, setText] = useState(sample);
+  const [uri, setURI] = useState('');
 
   const updateURI = useUpdateURI();
 
   const handleChange = (event) => {
     const userInput = event.target.value.trim();
+    const tmpUri = inputToURI(userInput);
     setText(userInput);
-    updateURI(userInput, 2000);
+    setURI(tmpUri);
+    updateURI(tmpUri, 2000);
   };
 
   const handleBlur = (event) => {
     const userInput = event.target.value.trim();
-    updateURI(userInput);
+    const tmpUri = inputToURI(userInput);
+    setURI(tmpUri);
+    updateURI(tmpUri);
   };
 
   const cases = useMemo(() => {
@@ -215,6 +229,17 @@ function Calculator({ onCasesChange }) {
           autoComplete="off"
           spellCheck="false"
         />
+        {selected && (
+          <>
+            {uri && (
+              <Clipboard data-clipboard-text={uri}>
+                <Octicon name="clippy" />
+                현재 결과 URI 복사
+              </Clipboard>
+            )}
+            <hr />
+          </>
+        )}
       </div>
       <div className={styles.showcase}>
         {cases.length > 1 && (
