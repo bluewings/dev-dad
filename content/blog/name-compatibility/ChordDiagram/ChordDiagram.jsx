@@ -17,7 +17,7 @@ function ChordDiagram({ cases }) {
     return null;
   }
 
-  return <div classNane={styles.root} style={{ marginBottom: '1.75rem' }} ref={container} />;
+  return <div className={styles.root} style={{ marginBottom: '1.75rem' }} ref={container} />;
 }
 
 export default ChordDiagram;

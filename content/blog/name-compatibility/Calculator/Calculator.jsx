@@ -1,5 +1,5 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useMemo, useState, useEffect } from 'react';
+/* eslint-disable jsx-a11y/anchor-is-valid, no-restricted-globals, react/no-array-index-key */
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { interpolateRdYlBu, hsl } from 'd3';
 import Octicon from 'react-octicon';
@@ -44,8 +44,48 @@ const compareScore = (a, b) => {
   return a.score < b.score ? 1 : -1;
 };
 
+function useUpdateURI() {
+  const timerId = useRef();
+  const updater = useMemo(
+    () => (userInput, delay = 0) => {
+      if (timerId.current) {
+        clearTimeout(timerId.current);
+      }
+      timerId.current = setTimeout(() => {
+        try {
+          const currURI = location.href.replace(location.origin, '');
+          const nextURI = `${location.pathname}?user-input=${encodeURIComponent(userInput)}`;
+          if (currURI !== nextURI) {
+            history.replaceState(null, document.title, nextURI);
+          }
+        } catch (err) {
+          /* ignore */
+        }
+      }, delay);
+    },
+    [],
+  );
+  useEffect(
+    () => () => {
+      if (timerId.current) {
+        clearTimeout(timerId.current);
+      }
+    },
+    [],
+  );
+  return updater;
+}
+
 function Calculator({ onCasesChange }) {
   const sample = useMemo(() => {
+    try {
+      const userInput = location.search && decodeURIComponent(location.search.split(/[?&]user-input=/)[1] || '');
+      if (userInput && userInput.trim()) {
+        return userInput.trim();
+      }
+    } catch (err) {
+      /* ignore */
+    }
     return shuffle(seed)
       .slice(0, 8)
       .join(' ');
@@ -53,8 +93,17 @@ function Calculator({ onCasesChange }) {
 
   const [text, setText] = useState(sample);
 
+  const updateURI = useUpdateURI();
+
   const handleChange = (event) => {
-    setText(event.target.value.trim());
+    const userInput = event.target.value.trim();
+    setText(userInput);
+    updateURI(userInput, 2000);
+  };
+
+  const handleBlur = (event) => {
+    const userInput = event.target.value.trim();
+    updateURI(userInput);
   };
 
   const cases = useMemo(() => {
@@ -159,7 +208,13 @@ function Calculator({ onCasesChange }) {
   return (
     <div className={styles.root}>
       <div className={styles.input}>
-        <TextareaAutosize defaultValue={sample} onChange={handleChange} autocomplete="off" spellcheck="false" />
+        <TextareaAutosize
+          defaultValue={sample}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          autoComplete="off"
+          spellCheck="false"
+        />
       </div>
       <div className={styles.showcase}>
         {cases.length > 1 && (
@@ -176,6 +231,7 @@ function Calculator({ onCasesChange }) {
               {filtered.map((e, i) => {
                 return (
                   <li
+                    key={i}
                     data-case-index={i}
                     onFocus={handleCaseFocus}
                     onMouseOver={handleCaseFocus}
