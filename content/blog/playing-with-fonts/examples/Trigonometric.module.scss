@@ -1,0 +1,26 @@
+.root {
+  margin-bottom: 1.75rem;
+  svg {
+    stroke-width: 1;
+    stroke: #888;
+    fill: none;
+    .graph,
+    .joint {
+      stroke: #000;
+      fill: #000;
+    }
+  }
+}
+
+body:global(.dark) {
+  .root {
+    svg {
+      stroke: #888;
+      .graph,
+      .joint {
+        stroke: #fff;
+        fill: #fff;
+      }
+    }
+  }
+}

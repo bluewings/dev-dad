@@ -54,6 +54,7 @@
     "react-octicon": "^3.0.1",
     "react-textarea-autosize": "^7.1.0",
     "react-typography": "^0.16.18",
+    "react-warp-text": "^0.1.6",
     "retoggle": "^0.3.0",
     "scrollama": "^2.0.0",
     "tailwindcss": "^1.0.1",

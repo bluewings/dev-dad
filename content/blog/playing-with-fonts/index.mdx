@@ -1,0 +1,231 @@
+---
+title: 폰트를 가지고 놀기
+date: "2019-06-23T01:58:01.363Z"
+---
+
+import WarpText, { transform1, transform2, transform3, transform4, transformA1, transformA2, paddingTop, paddingTop4,  } from './examples/WarpText';
+import JsonTree from './examples/JsonTree';
+import Trigonometric from './examples/Trigonometric';
+
+[Google Fonts + 한국어](https://googlefonts.github.io/korean/) 소개 페이지에는 신기한 타이포그래피 효과들이 있다. Google Fonts에서 제공하는 폰트에 다양한 효과를 적용해서 보여주고 있는데, 이 효과들은 단순한 CSS만으로는 적용이 불가능한 것들이어서, 웹 개발자들에게는 훨씬 더 흥미로워 보인다.
+
+위의 소개 페이지의 효과 중에서 가장 신기했던 파도치는 텍스트를 직접 구현했다. 우선 코딩의 결과는 다음과 같다.
+
+<WarpText message='아빠는 개발자' animate={true} />
+
+위 결과물을 구현하기 위해 다음의 단계를 거쳤다. 단계별 상세 과정은 아래에 설명한다.
+
+1. 텍스트를 벡터로 변환한다.
+2. SVG 또는 Canvas로 텍스트를 그린다.
+3. 변환함수를 사용하여 경로를 바꾼다. (그림을 흔든다)
+4. 3번의 과정을 반복한다. (애니메이션)
+
+-----
+
+## 1. 텍스트를 벡터로 변환한다.
+
+구글에서 font parser로 [opentype.js](https://opentype.js.org/)를 찾았다.
+
+> opentype.js is a JavaScript parser and writer for TrueType and OpenType fonts.
+
+[API 명세](https://github.com/opentypejs/opentype.js#fontstringtoglyphsstring)를 참고하여 폰트를 로딩한 후 글자의 형태를 어떻게 가져오는지 확인해보자.
+
+```js
+import { load } from 'opentype.js';
+
+load('blackhansans.woff', (err, font) => {
+  const glyphs = font.stringToGlyphs('아빠는 개발자');
+  console.log(glyphs);
+});
+```
+
+<JsonTree message='아빠는 개발자' />
+
+실행 결과를 확인해 보면, 각 글자에 대한 형태(glyph)와 관련된 정보를 얻을 수 있고, path.commands에 이를 글자로 그릴 수 있는 정보가 있다. (각 노드를 클릭하면 상세 정보를 볼 수 있다)
+
+## 2. SVG 또는 Canvas로 텍스트를 그린다.
+
+SVG를 사용하면 path.commands에 담긴 정보로 경로를 그릴 수 있다. 만약 Canvas를 사용한다면 다음의 메소드를 사용하면 된다. [moveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo), [lineTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo), [quadraticCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo), [bezierCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo)
+
+path.commands 정보로 SVG에 경로와 포인트를 그려보았다.
+
+참고: [Paths - SVG: Scalable Vector Graphics | MDN](https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/Paths#%EC%84%A0(Line)_%EB%AA%85%EB%A0%B9%EC%96%B4)
+
+
+<WarpText message='아빠는 개발자' outline={true} transform={null} padding={10}
+paddingTop={2}
+paddingBottom={2}
+/>
+
+## 3. 변환함수를 사용하여 경로를 바꾼다. (그림을 흔든다)
+
+검색으로 [Warp.js](https://benjamminf.github.io/warpjs/)란 라이브러리를 찾았다. 이 라이브러리는 SVG의 경로를 사용자 정의 함수를 사용하여 형태로 왜곡시킬 수 있게 해준다. [Warp.js 예제](https://codepen.io/benjamminf/pen/NpZLeb) 참고
+
+삼각함수를 사용하면 흔들리는 효과를 나타낼 수 있을 것 같다. 이전 단계의 결과 그림에서 y좌표에 Sine 함수를 사용하여 변환하면 다음과 같은 결과가 나타났다. 짜잔!
+
+```js
+const warp = new Warp(svg);
+
+warp.transform(([ x, y ]) => [ x, y + 15 * Math.sin(x / 50) ]);
+```
+
+<WarpText message='아빠는 개발자' animate={false} outline={true}
+/>
+
+## 4. 3번의 과정을 반복한다. (애니메이션)
+
+Sine함수를 계속 이동시키면서 그리면 다음과 같은 에니메이션을 볼 수 있다.
+
+<Trigonometric />
+
+이걸 텍스트에 적용하면 다음과 같다. 디바이스의 성능에 관계없이 동일한 속도를 유지하려면 시간의 offset값을 인자로 활용하면 된다.
+
+<WarpText message='아빠는 개발자' animate={true} />
+
+```js
+const warp = new Warp(svg);
+
+// 에니메이션 적용 이전 원본의 좌표를 기억하기 위해 3, 4번째 인자로 x, y값을 넘김
+warp.transform(([x, y]) => [x, y, x, y]);
+
+// 에니메이션 시작 시점
+const startAt = new Date().valueOf();
+
+function animate() {
+  // 재생시점의 offset값
+  const offset = (new Date().valueOf() - startAt) / 1000;
+  // 이전 값이 아닌 원본의 좌표값으로 좌표를 계산하고, 원본값은 그대로 전달
+  warp.transform(([x, y, ox, oy]) => [
+    x,
+    oy + 15 * Math.sin(x / 50 + offset),
+    ox,
+    oy,
+  ]);
+  requestAnimationFrame(animate);
+}
+
+animate();
+```
+
+-----
+
+## 다른 효과 적용
+
+transform 함수를 변경하면 다양한 효과를 만들어 보았다.
+
+<WarpText
+  message='니모를 찾아서'
+  transform={transform1}
+  animate
+  paddingTop={2}
+/>
+
+```js
+function transform([x, y, { innerHeight, scale, offset }]) {
+  const wave = scale(0.2);
+  const z = Math.max(0, y / innerHeight - 0.1);
+  return [
+    x,
+    y + wave * Math.sin((x + scale(offset) / 400 / 2) / scale(0.5)) * z,
+  ];
+}
+```
+
+<div style={{ height: '5rem' }} />
+
+<WarpText
+  message='부들부들'
+  transform={transform2}
+  animate
+  interpolate={20}
+  paddingTop={2}
+  paddingBottom={2}
+/>
+
+```js
+function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.02);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 2000) / scale(0.05)),
+    y + wave * Math.sin((x + scale(offset) / 2000) / scale(0.05)),
+  ];
+}
+```
+
+<div style={{ height: '5rem' }} />
+
+<WarpText
+  message='어지러워요...'
+  fontFamily='Cute Font'
+  transform={transform3}
+  animate
+  interpolate={20}
+  padding={paddingTop}
+/>
+
+```js
+function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.2);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 1000) / scale(0.5)),
+    y + wave * Math.sin((x + scale(offset) / 1000) / scale(0.5)),
+  ];
+}
+```
+
+<div style={{ height: '5rem' }} />
+
+<WarpText
+  message='토끼는 깡총깡총'
+  fontFamily='Cute Font'
+  transform={transform4}
+  animate
+  paddingTop={paddingTop4}
+  paddingBottom={2}
+/>
+
+```js
+function transform([x, y, { scale, offset, charX }]) {
+  const wave = scale(0.5);
+  return [
+    x,
+    y - wave * Math.abs(Math.sin((charX + scale(offset) / 600) / scale(0.4))),
+  ];
+}
+```
+
+<div style={{ height: '5rem' }} />
+
+<div style={{ position: 'relative', maxWidth: 600 }}>
+  <WarpText
+    message="해운대"
+    transform={transformA1}
+    color="silver"
+    paddingRight={200}
+    paddingBottom={150}
+  />
+  <div style={{ position: 'absolute', top: 0, width: '100%' }}>
+    <WarpText message="해운대"
+    transform={transformA2}
+    paddingRight={200}
+    paddingBottom={200}/>
+  </div>
+</div>
+
+```js
+function transformA1([x, y, { innerHeight }]) {
+  return [
+    x + innerHeight - y,
+    innerHeight * 0.5 + y * 0.5 + x / 3,
+  ];
+}
+function transformA2([x, y]) {
+  return [
+    x,
+    y + x / 3,
+  ];
+}
+
+```
+
+<div style={{ height: '5rem' }} />
