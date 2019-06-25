@@ -11,7 +11,7 @@ import Trigonometric from './examples/Trigonometric';
 
 위의 소개 페이지의 효과 중에서 가장 신기했던 파도치는 텍스트를 직접 구현했다. 우선 코딩의 결과는 다음과 같다.
 
-<WarpText message='아빠는 개발자' animate={true} />
+<WarpText message='아빠는 개발자' animate />
 
 위 결과물을 구현하기 위해 다음의 단계를 거쳤다. 단계별 상세 과정은 아래에 설명한다.
 
@@ -51,10 +51,13 @@ path.commands 정보로 SVG에 경로와 포인트를 그려보았다.
 
 참고: [Paths - SVG: Scalable Vector Graphics | MDN](https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/Paths#%EC%84%A0(Line)_%EB%AA%85%EB%A0%B9%EC%96%B4)
 
-
-<WarpText message='아빠는 개발자' outline={true} transform={null} padding={10}
-paddingTop={2}
-paddingBottom={2}
+<WarpText
+  message='아빠는 개발자'
+  outline
+  transform={null}
+  padding={10}
+  paddingTop={2}
+  paddingBottom={2}
 />
 
 ## 3. 변환함수를 사용하여 경로를 바꾼다. (그림을 흔든다)
@@ -69,8 +72,7 @@ const warp = new Warp(svg);
 warp.transform(([ x, y ]) => [ x, y + 15 * Math.sin(x / 50) ]);
 ```
 
-<WarpText message='아빠는 개발자' animate={false} outline={true}
-/>
+<WarpText message='아빠는 개발자' outline />
 
 ## 4. 3번의 과정을 반복한다. (애니메이션)
 
@@ -80,7 +82,7 @@ Sine함수를 계속 이동시키면서 그리면 다음과 같은 에니메이�
 
 이걸 텍스트에 적용하면 다음과 같다. 디바이스의 성능에 관계없이 동일한 속도를 유지하려면 시간의 offset값을 인자로 활용하면 된다.
 
-<WarpText message='아빠는 개발자' animate={true} />
+<WarpText message='아빠는 개발자' animate />
 
 ```js
 const warp = new Warp(svg);
@@ -111,7 +113,7 @@ animate();
 
 ## 다른 효과 적용
 
-transform 함수를 변경하면 다양한 효과를 만들어 보았다.
+transform 함수를 변경하여 다양한 효과를 만들어 보았다.
 
 <WarpText
   message='니모를 찾아서'
