@@ -11,14 +11,14 @@ exports.createPages = ({ graphql, actions }) => {
   Object.keys(supportedLanguages).forEach((langKey) => {
     createPage({
       path: langKey === langKeyDefault ? '/' : `/${langKey}/`,
-      component: path.resolve('./src/templates/blog-index.jsx'),
+      component: path.resolve('./src/templates/BlogIndex.tsx'),
       context: {
         langKey,
       },
     });
   });
 
-  const blogPost = path.resolve(`./src/templates/blog-post.jsx`);
+  const blogPost = path.resolve(`./src/templates/BlogPost.tsx`);
   return graphql(
     `
       {

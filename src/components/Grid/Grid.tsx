@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Grid.module.scss';
 
-function Grid({ children, layoutFixed }) {
-  const container = useRef();
+function Grid({ children, layoutFixed }: any) {
+  const container = useRef<any>();
 
   const [height, setHeight] = useState(0);
 

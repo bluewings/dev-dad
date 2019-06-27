@@ -1,12 +1,11 @@
 import React from 'react';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from 'react-live';
-import './code.scss';
+import './Code.scss';
 
-const identity = (e) => e;
+const identity = (e: any) => e;
 
-export const Code = ({ codeString, language, highlightLines, ...props }) => {
-  // eslint-disable-next-line
+export const Code = ({ codeString, language, highlightLines, ...props }: any) => {
   if (props['react-live']) {
     return (
       <LiveProvider code={codeString} noInline>
@@ -16,7 +15,7 @@ export const Code = ({ codeString, language, highlightLines, ...props }) => {
       </LiveProvider>
     );
   }
-  const overrideProps = (prev, type) => {
+  const overrideProps = (prev: any, type?: any) => {
     const next = { ...prev };
     delete next.style;
     if (type === 'line' && highlightLines && highlightLines.indexOf(next.key) !== -1) {

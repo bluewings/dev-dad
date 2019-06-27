@@ -8,12 +8,13 @@ import { supportedLanguages, langKeyDefault } from '../../i18n';
 // https://www.w3.org/International/articles/language-tags/
 // https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 // https://discuss.httparchive.org/t/what-are-the-invalid-uses-of-the-lang-attribute/1022
-export const codeToLanguage = (code) => supportedLanguages[code].replace(/ /g, ' ' /* nbsp */);
+// @ts-ignore
+export const codeToLanguage = (code: string) => supportedLanguages[code].replace(/ /g, ' ' /* nbsp */);
 
 // TODO: the curried signature is weird.
-export const createLanguageLink = (slug, lang) => {
+export const createLanguageLink = (slug: any, lang: any) => {
   const rawSlug = slug.replace(`${lang}/`, '');
-  return (targetLang) => (targetLang === langKeyDefault ? rawSlug : `${targetLang}${rawSlug}`);
+  return (targetLang: any) => (targetLang === langKeyDefault ? rawSlug : `${targetLang}${rawSlug}`);
 };
 
 export const getLangKeyDefault = () => langKeyDefault;

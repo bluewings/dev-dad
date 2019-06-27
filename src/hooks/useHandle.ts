@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 
-function useHandle(callback) {
-  const handle = useRef();
+function useHandle(callback: any) {
+  const handle = useRef<any>();
   handle.current = callback;
-  return (...args) => {
+  return (...args: any[]) => {
     if (typeof handle.current === 'function') {
       handle.current(...args);
     }

@@ -1,8 +1,8 @@
 import React, { useContext, useMemo } from 'react';
 import { Context } from '../../../src/utils/context';
 
-function ContextConsumer(props) {
-  const { data, setData: setValue } = useContext(Context);
+function ContextConsumer(props: any) {
+  const { data, setData: setValue }: any = useContext(Context);
 
   const value = useMemo(() => data || {}, [data]);
 

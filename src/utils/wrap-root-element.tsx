@@ -1,13 +1,13 @@
 import React from 'react';
 import { MDXProvider } from '@mdx-js/tag';
 import rangeParser from 'parse-numeric-range';
-import { Code } from '../components/code';
+import { Code } from '../components/Code';
 import Grid from '../components/Grid';
 import { Provider as ThemeProvider } from './theme-context';
 import { Provider as DataProvider } from './context';
 import styles from './wrap.module.scss';
 
-const preToCodeBlock = (preProps) => {
+const preToCodeBlock = (preProps: any) => {
   if (
     // children is MDXTag
     preProps.children &&
@@ -52,9 +52,10 @@ const GRID_WRAPPER = 'row';
 
 const parseNode = (() => {
   const pattern = /^gatsby--([^\s]+)$/;
-  return (node) => {
+  return (node: any) => {
     const { type, key, props } = node;
     if (typeof type === 'string' && type.search(pattern) === 0) {
+      // @ts-ignore
       const [, tagName] = type.match(pattern);
       let tag = tagName.replace(/end$/, '');
       const open = tagName === tag;
@@ -67,11 +68,11 @@ const parseNode = (() => {
   };
 })();
 
-const getParent = (stack) => stack.slice(-1)[0] || {};
+const getParent = (stack: any) => stack.slice(-1)[0] || {};
 
-const getCursor = (stack, root) => getParent(stack).cursor || root;
+const getCursor = (stack: any, root: any) => getParent(stack).cursor || root;
 
-const getChildProps = (tag, props = {}) => {
+const getChildProps = (tag: string, props: any = {}) => {
   const { id, className, args = [], params = {} } = props;
 
   const styleKeys = ['background', 'color', 'overflow', 'minHeight', 'maxHeight', 'height'];
@@ -84,9 +85,13 @@ const getChildProps = (tag, props = {}) => {
     .filter((e) => e.search(/^@/) !== -1)
     .reduce((accum, key) => ({ ...accum, [key.replace(/^@/, 'data-')]: params[key] }), {});
 
-  const childProps = {
+  const childProps: any = {
     ...dataProps,
-    className: [`gatsby--${tag}`, ...[tag, ...(args || []).map((e) => `${tag}_${e}`)].map((e) => styles[e]), className]
+    className: [
+      `gatsby--${tag}`,
+      ...[tag, ...(args || []).map((e: any) => `${tag}_${e}`)].map((e) => styles[e]),
+      className,
+    ]
       .filter((e) => e)
       .join(' '),
   };
@@ -104,7 +109,7 @@ const getChildProps = (tag, props = {}) => {
 // components is its own object outside of render so that the references to
 // components are stable
 const components = {
-  pre: (preProps) => {
+  pre: (preProps: any) => {
     const props = preToCodeBlock(preProps);
     // if there's a codeString and some props, we passed the test
     if (props) {
@@ -113,11 +118,11 @@ const components = {
     // it's possible to have a pre without a code in it
     return <pre {...preProps} />;
   },
-  wrapper: (gridProps) => {
+  wrapper: (gridProps: any) => {
     const children = Array.isArray(gridProps.children) ? gridProps.children : [gridProps.children];
 
     return children.reduce(
-      (accum, child, i) => {
+      (accum: any, child: any) => {
         const { tag, key, props, open } = parseNode(child);
         const { stack, root } = accum;
 
@@ -129,7 +134,7 @@ const components = {
               stack.pop();
             }
             if (tag === GRID && getParent(stack).tag !== GRID_WRAPPER) {
-              const columns = [];
+              const columns: any = [];
               const childProps = getChildProps(GRID_WRAPPER);
               getCursor(stack, root).push(
                 <div key={key} {...childProps} data-snippet-tag={GRID_WRAPPER}>
@@ -138,7 +143,7 @@ const components = {
               );
               stack.push({ tag: GRID_WRAPPER, cursor: columns });
             }
-            const childNodes = [];
+            const childNodes: any = [];
             const childProps = getChildProps(tag, props);
             let next = (
               <div key={key} {...childProps} data-snippet-tag={tag}>
@@ -172,7 +177,7 @@ const components = {
   },
 };
 
-export const wrapRootElement = ({ element }) => (
+export const wrapRootElement = ({ element }: any) => (
   <ThemeProvider>
     <MDXProvider components={components}>{element}</MDXProvider>
   </ThemeProvider>

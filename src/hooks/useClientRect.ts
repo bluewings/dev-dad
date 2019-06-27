@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import { useState, useRef, useEffect } from 'react';
 
-function useClientRect(properties, clientRef) {
+function useClientRect(properties: any, clientRef: any) {
   const builtInRef = useRef();
-  const requestId = useRef();
+  const requestId = useRef<any>();
 
   const _properties = Array.isArray(properties) ? properties : ['left', 'top', 'right', 'bottom', 'width', 'height'];
   const _clientRef = clientRef || builtInRef;

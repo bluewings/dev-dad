@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { StaticQuery, graphql } from 'gatsby';
-import { rhythm } from '../utils/typography';
+import { rhythm } from '../../utils/typography';
 
 function Footer() {
   return (

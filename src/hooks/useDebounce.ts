@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 
-function useDebounce(delay) {
-  const timerId = useRef();
+function useDebounce(delay: number) {
+  const timerId = useRef<any>();
   const debounce = useMemo(() => {
-    return (callback) => {
+    return (callback: Function) => {
       if (timerId.current) {
         clearTimeout(timerId.current);
       }

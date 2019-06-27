@@ -6,7 +6,7 @@ const initialState = { data: {} };
 
 const DataContext = React.createContext(initialState);
 
-const reducer = (state, action) => {
+const reducer = (state: any, action: any) => {
   const { type, payload } = action;
   switch (type) {
     case SET_DATA: {
@@ -25,12 +25,12 @@ const reducer = (state, action) => {
   return state;
 };
 
-function DataProvider({ children }) {
+function DataProvider({ children }: any) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const value = useMemo(() => {
     return {
       data: state.data,
-      setData: (key, data) => {
+      setData: (key: string, data: any) => {
         dispatch({
           type: SET_DATA,
           payload: { [key]: data },

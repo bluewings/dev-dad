@@ -1,8 +1,7 @@
-/* eslint-disable jsx-a11y/html-has-lang,react/jsx-filename-extension, react/destructuring-assignment, react/require-default-props, react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default function HTML(props) {
+export default function HTML(props: any) {
   return (
     <html {...props.htmlAttributes}>
       <head>

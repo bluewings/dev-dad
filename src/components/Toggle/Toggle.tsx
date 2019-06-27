@@ -1,10 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useContext, useRef, useMemo } from 'react';
-import styles from './toggle.module.scss';
-import { Context as ThemeContext } from '../utils/theme-context';
+import { Context as ThemeContext } from '../../utils/theme-context';
+import styles from './Toggle.module.scss';
 
 function __toggleTheme() {
   try {
+    // @ts-ignore
     return window.__toggleTheme();
   } catch (err) {
     /* ignore */
@@ -13,7 +13,7 @@ function __toggleTheme() {
 }
 
 function useTheme() {
-  const { theme, setTheme } = useContext(ThemeContext);
+  const { theme, setTheme }: any = useContext(ThemeContext);
 
   const rotate = useRef(0);
 
@@ -25,7 +25,7 @@ function useTheme() {
     return { transform: `rotate(${rotate.current}deg)` };
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme: any = () => {
     const newTheme = __toggleTheme();
     setTheme(newTheme);
   };

@@ -1,7 +1,7 @@
 body {
   &.light {
     .gatsby-highlight {
-      @import './code.theme-dark.scss';
+      @import './Code.theme-dark.scss';
       .token {
         &.property,
         &.number,
@@ -24,7 +24,7 @@ body {
   }
   &.dark {
     .gatsby-highlight {
-      @import './code.theme-light.scss';
+      @import './Code.theme-light.scss';
       .token {
         &.punctuation {
           color: #999;

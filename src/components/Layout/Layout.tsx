@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'gatsby';
-import { rhythm, scale } from '../utils/typography';
-import Toggle from './toggle';
-import Footer from './footer';
-import styles from './layout.module.scss';
-import '../styles/common.css';
+import { rhythm, scale } from '../../utils/typography';
+import Toggle from '../Toggle';
+import Footer from '../Footer';
+import styles from './Layout.module.scss';
+import '../../styles/common.css';
 
-function Layout(props) {
+function Layout(props: any) {
   const { location, title, children, maxWidth, isIndexPage } = props;
-  // eslint-disable-next-line
+  // @ts-ignore
   const rootPath = `${__PATH_PREFIX__}/`;
   let header;
 

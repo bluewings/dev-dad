@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, graphql } from 'gatsby';
-import Bio from '../components/bio';
-import Layout from '../components/layout';
-import SEO from '../components/seo';
+import Bio from '../components/Bio';
+import Layout from '../components/Layout';
+import SEO from '../components/SEO';
 import { rhythm } from '../utils/typography';
 
-function BlogIndex(props) {
+function BlogIndex(props: any) {
   const { data, location } = props;
   const siteTitle = data.site.siteMetadata.title;
   const posts = data.allMdx.edges;
@@ -14,7 +14,7 @@ function BlogIndex(props) {
     <Layout location={location} title={siteTitle} isIndexPage>
       <SEO title="All posts" keywords={[`blog`, `gatsby`, `javascript`, `react`]} />
       <Bio />
-      {posts.map(({ node }) => {
+      {posts.map(({ node }: any) => {
         const title = node.frontmatter.title || node.fields.slug;
         return (
           <div key={node.fields.slug}>

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import useScrollama from './useScrollama';
 
-function Scrollama(props) {
+function Scrollama(props: any) {
   const scrollInfo = useScrollama(props);
 
   const { children } = props;
