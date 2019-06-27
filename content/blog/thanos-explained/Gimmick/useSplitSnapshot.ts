@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-function useSplitSnapshot(canvas, numOfLayers = 16) {
+function useSplitSnapshot(canvas: any, numOfLayers = 16) {
   return useMemo(() => {
     if (!canvas) {
       return { width: 0, height: 0, snapshots: [] };

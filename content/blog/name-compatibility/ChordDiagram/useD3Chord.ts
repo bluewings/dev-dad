@@ -2,11 +2,11 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import * as d3 from 'd3';
 
-const getGradientId = (d) => `linkGrad-${d.source.index}-${d.target.index}`;
+const getGradientId = (d: any) => `linkGrad-${d.source.index}-${d.target.index}`;
 
-function useMatrix(inputData) {
+function useMatrix(inputData: any) {
   return useMemo(() => {
-    const data = (inputData || []).map(({ names: [name1, name2], score1, score2 }) => ({
+    const data = (inputData || []).map(({ names: [name1, name2], score1, score2 }: any) => ({
       name1,
       name2,
       score1,
@@ -14,17 +14,17 @@ function useMatrix(inputData) {
     }));
 
     const names = Object.keys(
-      (data || []).reduce((accum, { name1, name2 }) => ({ ...accum, [name1]: true, [name2]: true }), {}),
+      (data || []).reduce((accum: any, { name1, name2 }: any) => ({ ...accum, [name1]: true, [name2]: true }), {}),
     );
 
-    const indexByName = names.reduce((accum, name, i) => ({ ...accum, [name]: i }), {});
-    const nameByIndex = names.reduce((accum, name, i) => ({ ...accum, [i]: name }), {});
+    const indexByName: any = names.reduce((accum, name, i) => ({ ...accum, [name]: i }), {});
+    const nameByIndex: any = names.reduce((accum, name, i) => ({ ...accum, [i]: name }), {});
 
     const nameCount = Object.keys(indexByName).length;
     const matrix = Array(nameCount)
-      .fill()
+      .fill(true)
       .map(() => Array(nameCount).fill(0));
-    data.forEach(({ name1, name2, score1, score2 }) => {
+    data.forEach(({ name1, name2, score1, score2 }: any) => {
       matrix[indexByName[name1]][indexByName[name2]] = score1;
       matrix[indexByName[name2]][indexByName[name1]] = score2;
     });
@@ -33,12 +33,12 @@ function useMatrix(inputData) {
   }, [inputData || null]);
 }
 
-function useD3Chord(cases, width = 600, height = 600) {
+function useD3Chord(cases: any, width = 600, height = 600) {
   const { matrix: data, nameByIndex } = useMatrix(cases);
 
   const [focus, setFocus] = useState(null);
 
-  const timerId = useRef();
+  const timerId = useRef<any>();
 
   useEffect(() => {
     if (timerId.current) {
@@ -67,6 +67,7 @@ function useD3Chord(cases, width = 600, height = 600) {
 
       const svg = d3
         .create('svg')
+        // @ts-ignore
         .attr('viewBox', [-width / 2, -height / 2, width, height])
         .attr('font-size', 10)
         .attr('font-family', 'sans-serif');
@@ -81,9 +82,9 @@ function useD3Chord(cases, width = 600, height = 600) {
 
       group
         .append('path')
-        .attr('fill', (d) => color(d.index))
+        .attr('fill', (d: any) => color(d.index))
         .attr('d', arc)
-        .on('mouseover', (d) => {
+        .on('mouseover', (d: any) => {
           if (timerId.current) {
             clearTimeout(timerId.current);
           }
@@ -97,18 +98,18 @@ function useD3Chord(cases, width = 600, height = 600) {
 
       group
         .append('text')
-        .each((d) => {
+        .each((d: any) => {
           d.angle = (d.startAngle + d.endAngle) / 2;
         })
         .attr('dy', '0em')
         .attr(
           'transform',
-          (d) => `
+          (d: any) => `
         rotate(${(d.angle * 180) / Math.PI - 90})
         translate(${innerRadius + 24})
         ${Math.PI / 2 < d.angle && d.angle < (Math.PI / 2) * 3 ? 'rotate(-90)' : 'rotate(90)'}`,
         )
-        .attr('text-anchor', (d) => (d.angle > Math.PI ? 'end' : null))
+        .attr('text-anchor', (d: any) => (d.angle > Math.PI ? 'end' : null))
         .attr('text-anchor', 'middle')
         .attr('alignment-baseline', 'middle')
         .attr('font-size', '30px')
@@ -116,8 +117,8 @@ function useD3Chord(cases, width = 600, height = 600) {
         // .attr('font-family', 'Gothic A1')
         // .attr('font-family', 'Black Han Sans A1')
         .attr('font-weight', '700')
-        .attr('fill', (d) => (d3.hsl(color(d.index)).l < 0.7 ? '#fff' : '#000'))
-        .text((d) => nameByIndex[d.index])
+        .attr('fill', (d: any) => (d3.hsl(color(d.index)).l < 0.7 ? '#fff' : '#000'))
+        .text((d: any) => nameByIndex[d.index])
         .attr('class', 'pointer-events-none');
 
       const grads = svg
@@ -130,22 +131,22 @@ function useD3Chord(cases, width = 600, height = 600) {
         .attr('gradientUnits', 'userSpaceOnUse')
         .attr(
           'x1',
-          (d) =>
+          (d: any) =>
             innerRadius * Math.cos((d.source.endAngle - d.source.startAngle) / 2 + d.source.startAngle - Math.PI / 2),
         )
         .attr(
           'y1',
-          (d) =>
+          (d: any) =>
             innerRadius * Math.sin((d.source.endAngle - d.source.startAngle) / 2 + d.source.startAngle - Math.PI / 2),
         )
         .attr(
           'x2',
-          (d) =>
+          (d: any) =>
             innerRadius * Math.cos((d.target.endAngle - d.target.startAngle) / 2 + d.target.startAngle - Math.PI / 2),
         )
         .attr(
           'y2',
-          (d) =>
+          (d: any) =>
             innerRadius * Math.sin((d.target.endAngle - d.target.startAngle) / 2 + d.target.startAngle - Math.PI / 2),
         );
 
@@ -153,13 +154,13 @@ function useD3Chord(cases, width = 600, height = 600) {
       grads
         .append('stop')
         .attr('offset', '0%')
-        .attr('stop-color', (d) => color(d.source.index));
+        .attr('stop-color', (d: any) => color(d.source.index));
 
       // set the ending color (at 100%)
       grads
         .append('stop')
         .attr('offset', '100%')
-        .attr('stop-color', (d) => color(d.target.index));
+        .attr('stop-color', (d: any) => color(d.target.index));
 
       svg
         .append('g')
@@ -168,14 +169,14 @@ function useD3Chord(cases, width = 600, height = 600) {
         .data(chords)
         .join('path')
         .attr('d', ribbon)
-        .attr('fill-opacity', (d) => {
+        .attr('fill-opacity', (d: any) => {
           if (focus === null || focus === d.source.index || focus === d.target.index) {
             return 0.67;
           }
           return 0.1;
         })
-        .attr('class', (d) => `chord chord-${d.source.index} chord-${d.source.target}`)
-        .style('fill', (d) => `url(#${getGradientId(d)})`);
+        .attr('class', (d: any) => `chord chord-${d.source.index} chord-${d.source.target}`)
+        .style('fill', (d: any) => `url(#${getGradientId(d)})`);
 
       return svg;
     } catch (err) {

@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 
 const HTML2CANVAS_URI = 'https://cdn.jsdelivr.net/npm/html2canvas-fixed@1.0.0/html2canvas-fixed.min.js';
 
-const loadScript = (src) => {
+const loadScript = (src: string) => {
   return new Promise((resolve, reject) => {
     const head = document.head || document.getElementsByTagName('head')[0];
     const script = document.createElement('script');
@@ -14,13 +14,14 @@ const loadScript = (src) => {
   });
 };
 
-let queue = [];
+let queue: any[] = [];
 
 function useHtml2canvas() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     (async () => {
+      // @ts-ignore
       if (!window.html2canvas) {
         await loadScript(HTML2CANVAS_URI);
       }
@@ -28,9 +29,9 @@ function useHtml2canvas() {
     })();
   }, []);
 
-  let html2canvas;
+  let html2canvas: any;
   try {
-    // eslint-disable-next-line
+    // @ts-ignore
     html2canvas = window.html2canvas;
   } catch (err) {
     /* ignore */
@@ -38,7 +39,7 @@ function useHtml2canvas() {
 
   return useMemo(() => {
     if (ready && html2canvas) {
-      return async (target, options) => {
+      return async (target: HTMLElement, options: any) => {
         await Promise.all(queue);
         const promise = html2canvas(target, options);
         queue = [promise];

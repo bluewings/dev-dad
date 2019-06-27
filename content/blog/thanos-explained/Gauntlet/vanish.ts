@@ -1,13 +1,13 @@
+// @ts-ignore
 import html2canvas from 'html2canvas';
 import { css } from 'emotion';
 
 const getStyles = (() => {
-  const cached = {};
-  return (duration) => {
+  const cached: any = {};
+  return (duration: any) => {
     if (!cached[duration]) {
       cached[duration] = {
         canvasGroup: css({
-          // border: '5px solid red',
           position: 'absolute',
           pointerEvents: 'none',
           canvas: {
@@ -25,7 +25,7 @@ const getStyles = (() => {
   };
 })();
 
-const vanish = async (target, options) => {
+const vanish = async (target: HTMLElement, options: any) => {
   const canvas = await html2canvas(target);
   const ctx = canvas.getContext('2d');
   if (ctx) {
@@ -37,12 +37,11 @@ const vanish = async (target, options) => {
     const styles = getStyles(duration);
     target.parentNode && target.parentNode.insertBefore(canvasGroup, target);
     const compuled = window.getComputedStyle(target);
-    // console.log(window.getComputedStyle(target).position)
     if (compuled.position === 'absolute' || compuled.position === 'fixed') {
       canvasGroup.style.position = compuled.position;
       canvasGroup.style.left = compuled.left;
       canvasGroup.style.top = compuled.top;
-      console.log([compuled.position, compuled.left, compuled.top]);
+      // @ts-ignore
       canvasGroup.style.zIndex = 10000;
     }
 

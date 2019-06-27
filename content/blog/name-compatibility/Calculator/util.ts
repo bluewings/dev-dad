@@ -5,7 +5,7 @@ const INITIALS = 'ㄱ,ㄲ,ㄴ,ㄷ,ㄸ,ㄹ,ㅁ,ㅂ,ㅃ,ㅅ,ㅆ,ㅇ,ㅈ,ㅉ,ㅊ,�
 const MEDIALS = 'ㅏ,ㅐ,ㅑ,ㅒ,ㅓ,ㅔ,ㅕ,ㅖ,ㅗ,ㅘ,ㅙ,ㅚ,ㅛ,ㅜ,ㅝ,ㅞ,ㅟ,ㅠ,ㅡ,ㅢ,ㅣ'.split(',');
 const FINALES = ',ㄱ,ㄲ,ㄳ,ㄴ,ㄵ,ㄶ,ㄷ,ㄹ,ㄺ,ㄻ,ㄼ,ㄽ,ㄾ,ㄿ,ㅀ,ㅁ,ㅂ,ㅄ,ㅅ,ㅆ,ㅇ,ㅈ,ㅊ,ㅋ,ㅌ,ㅍ,ㅎ'.split(',');
 
-const STROKES = [
+const STROKES: any = [
   ['', 0],
   ['ㄱ', 2],
   ['ㄲ', 4],
@@ -60,7 +60,7 @@ const STROKES = [
   ['ㅣ', 1],
 ].reduce((accum, [key, count]) => ({ ...accum, [key]: count }), {});
 
-const getSymbol = (char) => {
+const getSymbol = (char: string): any => {
   if (!char.match(/[ㄱ-ㅎ가-힣]/)) {
     return false;
   }
@@ -92,13 +92,13 @@ const getSymbol = (char) => {
   };
 };
 
-function getScore(name1, name2) {
-  const symbols1 = name1.match(/[\s\S]/g).map((char) => [char, getSymbol(char).numOfStrokes]);
-  const symbols2 = name2.match(/[\s\S]/g).map((char) => [char, getSymbol(char).numOfStrokes]);
+function getScore(name1: any, name2: any) {
+  const symbols1 = name1.match(/[\s\S]/g).map((char: string) => [char, getSymbol(char).numOfStrokes]);
+  const symbols2 = name2.match(/[\s\S]/g).map((char: string) => [char, getSymbol(char).numOfStrokes]);
   const maxLen = Math.max(symbols1.length, symbols2.length);
 
   const [chars, numbers] = Array(maxLen)
-    .fill()
+    .fill(true)
     .reduce(
       ([accum1, accum2], e, i) => {
         const [char1, num1] = symbols1[i] || ['', 0];
@@ -111,7 +111,7 @@ function getScore(name1, name2) {
   let nums = numbers.slice();
   const stages = [nums];
   while (nums.length > 2 && nums.join('') !== '100') {
-    nums = nums.reduce((a, e, i, arr) => {
+    nums = nums.reduce((a: any, e: any, i: number, arr: any[]) => {
       if (i < arr.length - 1) {
         return [...a, (e + arr[i + 1]) % 10];
       }
@@ -123,7 +123,7 @@ function getScore(name1, name2) {
   return { score: ~~stages.slice(-1)[0].join(''), chars, stages };
 }
 
-function shuffle(arr) {
+function shuffle(arr: any[]) {
   const array = arr.slice();
   let counter = array.length;
   // While there are elements in the array
