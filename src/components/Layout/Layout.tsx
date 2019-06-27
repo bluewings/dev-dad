@@ -5,6 +5,7 @@ import Toggle from '../Toggle';
 import Footer from '../Footer';
 import styles from './Layout.module.scss';
 import '../../styles/common.css';
+import '../../styles/tooltip.scss';
 
 function Layout(props: any) {
   const { location, title, children, maxWidth, isIndexPage } = props;

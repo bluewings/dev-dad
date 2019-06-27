@@ -10,6 +10,7 @@
   padding: 0;
   background: transparent;
   border: none;
+  cursor: pointer;
   .spinner {
     position: relative;
     top: ($toggle-size / 2 - $icon-size) / 2;
@@ -46,4 +47,7 @@
   to {
     transform: rotate(360deg);
   }
+}
+.tooltipText {
+  font-family: Montserrat, Black Han Sans;
 }

@@ -17,16 +17,22 @@ export default function HTML(props: any) {
             __html: `
             (function() {
 
+              var _preferredTheme;
               var preferredTheme;
               var THEME_LIGHT = 'light';
               var THEME_DARK = 'dark';
               
               try {
-                preferredTheme = localStorage.getItem('theme');
+                _preferredTheme = localStorage.getItem('theme');
+                preferredTheme = _preferredTheme;
               } catch (err) {}
-              
+
               function getTheme() {
                 return preferredTheme || THEME_LIGHT;
+              }
+
+              function getPreferredTheme() {
+                return _preferredTheme;
               }
               
               function setTheme(newTheme) {
@@ -55,6 +61,7 @@ export default function HTML(props: any) {
               }
               
               setTheme(getTheme());
+              window.__getPreferredTheme = getPreferredTheme;
               window.__getTheme = getTheme;
               window.__toggleTheme = toggleTheme;
 
