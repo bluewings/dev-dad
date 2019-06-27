@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getFont } from 'react-warp-text';
 import BaseJsonTree from '../../../components/JsonTree';
 
-function JsonTree({ message, fontFamily }) {
+function JsonTree({ message, fontFamily }: any) {
   const [glyphs, setGlyphs] = useState();
   useEffect(() => {
     (async () => {
@@ -20,12 +20,12 @@ function JsonTree({ message, fontFamily }) {
 
 export default JsonTree;
 
-const shouldExpandNode = (keyName) => {
+const shouldExpandNode = (keyName: string[]) => {
   const [firstKeyName] = keyName;
   return ['root', 0, 'path'].indexOf(firstKeyName) !== -1;
 };
 
-const labelRenderer = (raw) => {
+const labelRenderer = (raw: any[]) => {
   if (['path', 'commands'].indexOf(raw[0]) !== -1) {
     return <span style={{ background: '#E3342F', color: '#fff' }}>{raw[0].toString()}</span>;
   }

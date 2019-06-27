@@ -4,7 +4,7 @@ import Sample from '../Sample';
 import Gimmick from '../Gimmick';
 import styles from './Example2.module.scss';
 
-function Example2({ children }) {
+function Example2({ children }: any) {
   const className = useMemo(
     () =>
       `ex-${Math.random()
@@ -16,9 +16,9 @@ function Example2({ children }) {
   return (
     <div className={`${styles.root} ${className}`}>
       <Scrollama step={`.${className}`} offset=".5" progress>
-        {({ index, progress_ }) => {
+        {({ index, progress_ }: any) => {
           const [screenshot, setScreenshot] = useState();
-          const handleScreenshotCapture = (canvas) => {
+          const handleScreenshotCapture = (canvas: any) => {
             if (canvas) {
               setScreenshot(canvas);
             }

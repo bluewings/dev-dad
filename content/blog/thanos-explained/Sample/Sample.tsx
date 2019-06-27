@@ -16,10 +16,10 @@ function wait(delay = 0) {
   });
 }
 
-async function elementReady(element) {
+async function elementReady(element: HTMLElement) {
   const images = Array.from(element.querySelectorAll('img'));
   await Promise.all([
-    ...images.map((img) => {
+    ...images.map((img: any) => {
       return new Promise((resolve) => {
         if (img.complete) {
           resolve();
@@ -32,8 +32,8 @@ async function elementReady(element) {
   ]);
 }
 
-function useWidth(wrap) {
-  const timerId = useRef();
+function useWidth(wrap: any) {
+  const timerId = useRef<any>();
 
   const [width, setWidth] = useState(null);
 
@@ -63,12 +63,12 @@ function useWidth(wrap) {
   return width;
 }
 
-function Sample({ children, type, capture, onCapture, onLoad, flash = true }) {
+function Sample({ children, type, capture, onCapture, onLoad, flash = true }: any) {
   const theme = useTheme();
   const [key, setKey] = useState('tmp');
   const [mode, setMode] = useState(FONT);
   const [snapshot, setSnapshot] = useState(null);
-  const wrap = useRef();
+  const wrap = useRef<any>();
 
   const width = useWidth(wrap);
 
@@ -84,7 +84,7 @@ function Sample({ children, type, capture, onCapture, onLoad, flash = true }) {
   };
 
   const [onscreen, setOnscreen] = useState(false);
-  const requestId = useRef();
+  const requestId = useRef<any>();
 
   useEffect(() => {
     if (onscreen) {
@@ -178,7 +178,7 @@ function Sample({ children, type, capture, onCapture, onLoad, flash = true }) {
       </div>
       <div style={{ clear: 'both' }} />
       <div style={{ position: 'relative' }}>
-        <div className={onscreen && styles.onscreen} ref={wrap}>
+        <div className={(onscreen && styles.onscreen) || ''} ref={wrap}>
           <Heroes tick={key} type={type} />
         </div>
         {capture && flash && (

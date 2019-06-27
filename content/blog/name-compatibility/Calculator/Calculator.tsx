@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid, no-restricted-globals, react/no-array-index-key */
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, SyntheticEvent } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { interpolateRdYlBu, hsl } from 'd3';
 import Octicon from 'react-octicon';
@@ -30,7 +30,7 @@ const seed = [
   '정다원',
 ];
 
-const getAttrFromClosest = (source, attrName) => {
+const getAttrFromClosest = (source: any, attrName: any) => {
   const target = source.getAttribute(attrName) ? source : source.closest(`[${attrName}]`);
   if (target) {
     return target.getAttribute(attrName);
@@ -38,14 +38,14 @@ const getAttrFromClosest = (source, attrName) => {
   return null;
 };
 
-const compareScore = (a, b) => {
+const compareScore = (a: any, b: any) => {
   if (a.score === b.score) {
     return 0;
   }
   return a.score < b.score ? 1 : -1;
 };
 
-const inputToURI = (userInput) => {
+const inputToURI = (userInput: string) => {
   try {
     return `${location.origin}${location.pathname}?user-input=${encodeURIComponent(userInput)}`;
   } catch (err) {
@@ -55,9 +55,9 @@ const inputToURI = (userInput) => {
 };
 
 function useUpdateURI() {
-  const timerId = useRef();
+  const timerId = useRef<any>();
   const updater = useMemo(
-    () => (nextURI, delay = 0) => {
+    () => (nextURI: string, delay: number = 0) => {
       if (timerId.current) {
         clearTimeout(timerId.current);
       }
@@ -85,7 +85,7 @@ function useUpdateURI() {
   return updater;
 }
 
-function Calculator({ onCasesChange }) {
+function Calculator({ onCasesChange }: any) {
   const sample = useMemo(() => {
     try {
       const userInput = location.search && decodeURIComponent(location.search.split(/[?&]user-input=/)[1] || '');
@@ -105,7 +105,8 @@ function Calculator({ onCasesChange }) {
 
   const updateURI = useUpdateURI();
 
-  const handleChange = (event) => {
+  const handleChange = (event: SyntheticEvent) => {
+    // @ts-ignore
     const userInput = event.target.value.trim();
     const tmpUri = inputToURI(userInput);
     setText(userInput);
@@ -113,7 +114,8 @@ function Calculator({ onCasesChange }) {
     updateURI(tmpUri, 2000);
   };
 
-  const handleBlur = (event) => {
+  const handleBlur = (event: SyntheticEvent) => {
+    // @ts-ignore
     const userInput = event.target.value.trim();
     const tmpUri = inputToURI(userInput);
     setURI(tmpUri);
@@ -123,8 +125,8 @@ function Calculator({ onCasesChange }) {
   const cases = useMemo(() => {
     const all = text
       .split(/[\n\s,]/)
-      .map((e) => e.replace(/\s+/g, ''))
-      .filter((e) => e && e.length > 1 && e.length < 5 && e.search(/[^ㄱ-ㅎ가-힣]/) === -1);
+      .map((e: any) => e.replace(/\s+/g, ''))
+      .filter((e: any) => e && e.length > 1 && e.length < 5 && e.search(/[^ㄱ-ㅎ가-힣]/) === -1);
     const items = [];
     for (let x = 0; x < all.length; x += 1) {
       for (let y = 0; y < x; y += 1) {
@@ -149,11 +151,12 @@ function Calculator({ onCasesChange }) {
     return items;
   }, [text]);
 
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState<any>(null);
 
   const [query, setQuery] = useState('');
 
-  const handleFilterChange = (event) => {
+  const handleFilterChange = (event: SyntheticEvent) => {
+    // @ts-ignore
     setQuery(event.target.value.trim());
   };
 
@@ -178,14 +181,14 @@ function Calculator({ onCasesChange }) {
     return cases;
   }, [cases, query]);
 
-  const handleCaseFocus = (event) => {
+  const handleCaseFocus = (event: SyntheticEvent) => {
     const caseIndex = parseInt(getAttrFromClosest(event.target, 'data-case-index'), 10);
     if (selected !== filtered[caseIndex]) {
       setSelected(filtered[caseIndex]);
     }
   };
 
-  const getColors = (value) => {
+  const getColors = (value: number) => {
     try {
       const background = interpolateRdYlBu(1 - value / 100);
       const hsl1 = hsl(background);
@@ -202,8 +205,9 @@ function Calculator({ onCasesChange }) {
 
   const [tick, setTick] = useState('any');
 
-  const handleNameClick = (event) => {
+  const handleNameClick = (event: SyntheticEvent) => {
     event.preventDefault();
+    // @ts-ignore
     setQuery(event.target.innerText.replace(/\s/g, ''));
     setTick(
       Math.random()
@@ -214,7 +218,7 @@ function Calculator({ onCasesChange }) {
   const BASE = '가'.charCodeAt(0);
 
   Array(200)
-    .fill()
+    .fill(true)
     .map((e, i) => BASE + i)
     .map((i) => String.fromCharCode(i))
     .join('');
@@ -227,7 +231,7 @@ function Calculator({ onCasesChange }) {
           onChange={handleChange}
           onBlur={handleBlur}
           autoComplete="off"
-          spellCheck="false"
+          spellCheck={false}
         />
         {selected && (
           <>

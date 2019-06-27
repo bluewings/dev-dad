@@ -14,8 +14,8 @@ const OVERLAP_CANVASES = 'overlap-canvases';
 const ROTATE_AND_FADE_OUT = 'rotate-and-fade-out';
 
 const degreesToRadians = (() => {
-  const cache = {};
-  return (degrees) => {
+  const cache: any = {};
+  return (degrees: number) => {
     if (cache[degrees] === undefined) {
       cache[degrees] = degrees * (Math.PI / 180);
     }
@@ -23,7 +23,7 @@ const degreesToRadians = (() => {
   };
 })();
 
-function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
+function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }: any) {
   const [{ width: containerWidth }, clientRef] = useClientRect(['width']);
   const { width, height, snapshots } = useSplitSnapshot(screenshot, numOfLayers);
 
@@ -50,7 +50,7 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
         .clamp(true);
       return {
         canvas,
-        transformFn: (value) => {
+        transformFn: (value: any) => {
           const p = scaleDelay(value);
           let frameStyle = {
             transform: `rotate(${scaleRotate(p)}deg) translate(${scaleX(p)}px, ${scaleY(p)}px)`,
@@ -66,7 +66,7 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
     });
   }, [snapshots]);
 
-  const screenshotRef = useRef();
+  const screenshotRef = useRef<any>();
   useEffect(() => {
     if (screenshotRef.current && screenshot) {
       screenshotRef.current.innerHTML = '';
@@ -74,12 +74,12 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
     }
   }, [screenshotRef.current, screenshot]);
 
-  const layersRef = useRef();
+  const layersRef = useRef<any>();
   useEffect(() => {
     if (layersRef.current && layers) {
       const divs = Array.from(layersRef.current.querySelectorAll(`.${styles.holder}`));
       if (divs.length === layers.length) {
-        divs.forEach((div, i) => {
+        divs.forEach((div: any, i) => {
           // eslint-disable-next-line no-param-reassign
           div.innerHTML = '';
           div.appendChild(layers[i].canvas);
@@ -106,19 +106,22 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
     if (layers) {
       switch (true) {
         case stage === CREATE_IMAGE_DATA: {
-          return (index) => [{ transform: `translateZ(${(-zSize * index) / layers.length}px)` }, { opacity: 0 }];
+          return (index: number) => [
+            { transform: `translateZ(${(-zSize * index) / layers.length}px)` },
+            { opacity: 0 },
+          ];
         }
         case stage === MOVE_IMAGE_DATA: {
-          return (index, progress_) => [
+          return (index: number, progress_: number) => [
             { transform: `translateZ(${(-zSize * index) / layers.length}px)` },
             { width: width * progress_, overflow: 'hidden' },
           ];
         }
         case stage === OVERLAP_CANVASES: {
-          return (index) => [{ transform: `translateZ(${(-zSize * index) / layers.length}px)` }];
+          return (index: number) => [{ transform: `translateZ(${(-zSize * index) / layers.length}px)` }];
         }
         case stage === ROTATE_AND_FADE_OUT: {
-          return (index, progress_) => layers[index].transformFn(progress_);
+          return (index: number, progress_: number) => layers[index].transformFn(progress_);
         }
         default:
           break;
@@ -133,8 +136,8 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
         .domain([0.8, 0.2])
         .range([0, 1])
         .clamp(true);
-      const cache = {};
-      return (progress_) => {
+      const cache: any = {};
+      return (progress_: number) => {
         const p1 = scaled(stage === CREATE_IMAGE_DATA ? 1 - progress_ : progress_);
         if (!cache[p1]) {
           cache[p1] = {
@@ -204,7 +207,7 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }) {
         <hr />
       </div>
       {layers && (
-        <div style={{ visibility: showLayers ? 'visible' : 'hidden ' }}>
+        <div style={{ visibility: showLayers ? 'visible' : 'hidden' }}>
           <div className={styles.layers} style={{ ...containerStyle.outer }}>
             <div ref={layersRef} style={{ ...containerStyle.inner, width, height }}>
               {layers.map((e, i) => {

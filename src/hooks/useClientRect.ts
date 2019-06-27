@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { useState, useRef, useEffect } from 'react';
 
-function useClientRect(properties: any, clientRef: any) {
+function useClientRect(properties: any, clientRef?: any) {
   const builtInRef = useRef();
   const requestId = useRef<any>();
 

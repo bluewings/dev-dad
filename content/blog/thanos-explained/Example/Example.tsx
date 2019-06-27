@@ -4,9 +4,9 @@ import Gimmick from '../Gimmick';
 import Gauntlet from '../Gauntlet';
 import styles from './Example.module.scss';
 
-function Example(props) {
-  const [screenshot, setScreenshot] = useState(null);
-  const handleScreenshotCapture = (canvas) => {
+function Example(props: any) {
+  const [screenshot, setScreenshot] = useState<any>(null);
+  const handleScreenshotCapture = (canvas: HTMLCanvasElement) => {
     if (canvas) {
       setScreenshot(canvas);
     }

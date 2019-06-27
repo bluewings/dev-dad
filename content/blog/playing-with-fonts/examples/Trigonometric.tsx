@@ -3,13 +3,13 @@ import Warp from 'warpjs';
 import styles from './Trigonometric.module.scss';
 
 function Trigonometric({ radius = 45, padding = 5 }) {
-  const svg = useRef();
-  const sv1 = useRef();
-  const pathRadius = useRef();
-  const joint1 = useRef();
-  const joint2 = useRef();
+  const svg = useRef<any>();
+  const sv1 = useRef<any>();
+  const pathRadius = useRef<any>();
+  const joint1 = useRef<any>();
+  const joint2 = useRef<any>();
 
-  const container = useRef();
+  const container = useRef<any>();
 
   const [fullWidth, setFullWidth] = useState();
 
@@ -30,24 +30,24 @@ function Trigonometric({ radius = 45, padding = 5 }) {
   }, []);
 
   // const [offset, useSTs]
-  const animationFrame = useRef();
+  const animationFrame = useRef<any>();
 
   useEffect(() => {
     if (svg.current) {
       const warp = new Warp(svg.current);
 
       warp.interpolate(4);
-      warp.transform(([x, y]) => [x, y, x, y]);
+      warp.transform(([x, y]: any) => [x, y, x, y]);
 
       const start = new Date().valueOf();
 
-      function animate() {
+      const animate = () => {
         const now = new Date().valueOf();
 
         // start = new Date().valueOf();
 
         const offset = (now - start) / 500;
-        warp.transform(([x, y, ox, oy]) => [
+        warp.transform(([x, y, ox, oy]: any) => [
           ox,
           oy + radius * Math.cos((ox - (radius * 2 + padding * 3)) / 20 + offset),
         ]);
@@ -87,7 +87,7 @@ function Trigonometric({ radius = 45, padding = 5 }) {
         );
 
         animationFrame.current = requestAnimationFrame(animate);
-      }
+      };
 
       animate();
 

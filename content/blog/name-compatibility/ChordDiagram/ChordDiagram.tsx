@@ -2,10 +2,10 @@ import React, { useRef, useEffect } from 'react';
 import useD3Chord from './useD3Chord';
 import styles from './ChordDiagram.module.scss';
 
-function ChordDiagram({ cases }) {
+function ChordDiagram({ cases }: any) {
   const svg = useD3Chord(cases);
 
-  const container = useRef();
+  const container = useRef<any>();
   useEffect(() => {
     if (container.current && svg) {
       container.current.innerHTML = '';
