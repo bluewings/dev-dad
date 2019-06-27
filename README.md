@@ -1,3 +1,3 @@
 # dev-dad
 
-https://dev-dad.surge.sh/
+https://bluewings.github.io/dev-dad/
