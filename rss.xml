@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[아빠는 개발자]]></title><description><![CDATA[아빠는 개발자]]></description><link>https://github.com/bluewings/dev-dad</link><generator>RSS for Node</generator><lastBuildDate>Thu, 27 Jun 2019 05:21:15 GMT</lastBuildDate><item><title><![CDATA[폰트를 가지고 놀기]]></title><description><![CDATA[Google Fonts + 한국어  소개 페이지에는 신기한 타이포그래피 효과들이 있다. Google Fonts에서 제공하는 폰트에 다양한 효과를 적용해서 보여주고 있는데, 이 효과들은 단순한 CSS…]]></description><link>https://github.com/bluewings/dev-dad/playing-with-fonts/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/playing-with-fonts/</guid><pubDate>Sun, 23 Jun 2019 01:58:01 GMT</pubDate><content:encoded>&lt;div&gt;&lt;p&gt;&lt;a href=&quot;https://googlefonts.github.io/korean/&quot;&gt;Google Fonts + 한국어&lt;/a&gt; 소개 페이지에는 신기한 타이포그래피 효과들이 있다. Google Fonts에서 제공하는 폰트에 다양한 효과를 적용해서 보여주고 있는데, 이 효과들은 단순한 CSS만으로는 적용이 불가능한 것들이어서, 웹 개발자들에게는 훨씬 더 흥미로워 보인다.&lt;/p&gt;&lt;p&gt;위의 소개 페이지의 효과 중에서 가장 신기했던 파도치는 텍스트를 직접 구현했다. 우선 코딩의 결과는 다음과 같다.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;위 결과물을 구현하기 위해 다음의 단계를 거쳤다. 단계별 상세 과정은 아래에 설명한다.&lt;/p&gt;&lt;ol&gt;&lt;li&gt;텍스트를 벡터로 변환한다.&lt;/li&gt;&lt;li&gt;SVG 또는 Canvas로 텍스트를 그린다.&lt;/li&gt;&lt;li&gt;변환함수를 사용하여 경로를 바꾼다. (그림을 흔든다)&lt;/li&gt;&lt;li&gt;3번의 과정을 반복한다. (애니메이션)&lt;/li&gt;&lt;/ol&gt;&lt;hr/&gt;&lt;h2&gt;1. 텍스트를 벡터로 변환한다.&lt;/h2&gt;&lt;p&gt;구글에서 font parser로 &lt;a href=&quot;https://opentype.js.org/&quot;&gt;opentype.js&lt;/a&gt;를 찾았다.&lt;/p&gt;&lt;blockquote&gt;&lt;p&gt;opentype.js is a JavaScript parser and writer for TrueType and OpenType fonts.&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/opentypejs/opentype.js#fontstringtoglyphsstring&quot;&gt;API 명세&lt;/a&gt;를 참고하여 폰트를 로딩한 후 글자의 형태를 어떻게 가져오는지 확인해보자.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { load } from &amp;#x27;opentype.js&amp;#x27;;
+
+load(&amp;#x27;blackhansans.woff&amp;#x27;, (err, font) =&amp;gt; {
+  const glyphs = font.stringToGlyphs(&amp;#x27;아빠는 개발자&amp;#x27;);
+  console.log(glyphs);
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;/div&gt;&lt;p&gt;실행 결과를 확인해 보면, 각 글자에 대한 형태(glyph)와 관련된 정보를 얻을 수 있고, path.commands에 이를 글자로 그릴 수 있는 정보가 있다. (각 노드를 클릭하면 상세 정보를 볼 수 있다)&lt;/p&gt;&lt;h2&gt;2. SVG 또는 Canvas로 텍스트를 그린다.&lt;/h2&gt;&lt;p&gt;SVG를 사용하면 path.commands에 담긴 정보로 경로를 그릴 수 있다. 만약 Canvas를 사용한다면 다음의 메소드를 사용하면 된다. &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo&quot;&gt;moveTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo&quot;&gt;lineTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo&quot;&gt;quadraticCurveTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo&quot;&gt;bezierCurveTo&lt;/a&gt;&lt;/p&gt;&lt;p&gt;path.commands 정보로 SVG에 경로와 포인트를 그려보았다.&lt;/p&gt;&lt;p&gt;참고: &lt;a href=&quot;https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/Paths#%EC%84%A0(Line)_%EB%AA%85%EB%A0%B9%EC%96%B4&quot;&gt;Paths - SVG: Scalable Vector Graphics | MDN&lt;/a&gt;&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;outline css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;h2&gt;3. 변환함수를 사용하여 경로를 바꾼다. (그림을 흔든다)&lt;/h2&gt;&lt;p&gt;검색으로 &lt;a href=&quot;https://benjamminf.github.io/warpjs/&quot;&gt;Warp.js&lt;/a&gt;란 라이브러리를 찾았다. 이 라이브러리는 SVG의 경로를 사용자 정의 함수를 사용하여 형태로 왜곡시킬 수 있게 해준다. &lt;a href=&quot;https://codepen.io/benjamminf/pen/NpZLeb&quot;&gt;Warp.js 예제&lt;/a&gt; 참고&lt;/p&gt;&lt;p&gt;삼각함수를 사용하면 흔들리는 효과를 나타낼 수 있을 것 같다. 이전 단계의 결과 그림에서 y좌표에 Sine 함수를 사용하여 변환하면 다음과 같은 결과가 나타났다. 짜잔!&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const warp = new Warp(svg);
+
+warp.transform(([ x, y ]) =&amp;gt; [ x, y + 15 * Math.sin(x / 50) ]);
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;outline css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;h2&gt;4. 3번의 과정을 반복한다. (애니메이션)&lt;/h2&gt;&lt;p&gt;Sine함수를 계속 이동시키면서 그리면 다음과 같은 에니메이션을 볼 수 있다.&lt;/p&gt;&lt;div class=&quot;Trigonometric-module--root--2SaYN&quot;&gt;&lt;/div&gt;&lt;p&gt;이걸 텍스트에 적용하면 다음과 같다. 디바이스의 성능에 관계없이 동일한 속도를 유지하려면 시간의 offset값을 인자로 활용하면 된다.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const warp = new Warp(svg);
+
+// 에니메이션 적용 이전 원본의 좌표를 기억하기 위해 3, 4번째 인자로 x, y값을 넘김
+warp.transform(([x, y]) =&amp;gt; [x, y, x, y]);
+
+// 에니메이션 시작 시점
+const startAt = new Date().valueOf();
+
+function animate() {
+  // 재생시점의 offset값
+  const offset = (new Date().valueOf() - startAt) / 1000;
+  // 이전 값이 아닌 원본의 좌표값으로 좌표를 계산하고, 원본값은 그대로 전달
+  warp.transform(([x, y, ox, oy]) =&amp;gt; [
+    x,
+    oy + 15 * Math.sin(x / 50 + offset),
+    ox,
+    oy,
+  ]);
+  requestAnimationFrame(animate);
+}
+
+animate();
+&lt;/code&gt;&lt;/pre&gt;&lt;hr/&gt;&lt;h2&gt;다른 효과 적용&lt;/h2&gt;&lt;p&gt;transform 함수를 변경하여 다양한 효과를 만들어 보았다.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { innerHeight, scale, offset }]) {
+  const wave = scale(0.2);
+  const z = Math.max(0, y / innerHeight - 0.1);
+  return [
+    x,
+    y + wave * Math.sin((x + scale(offset) / 400 / 2) / scale(0.5)) * z,
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.02);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 2000) / scale(0.05)),
+    y + wave * Math.sin((x + scale(offset) / 2000) / scale(0.05)),
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.2);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 1000) / scale(0.5)),
+    y + wave * Math.sin((x + scale(offset) / 1000) / scale(0.5)),
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { scale, offset, charX }]) {
+  const wave = scale(0.5);
+  return [
+    x,
+    y - wave * Math.abs(Math.sin((charX + scale(offset) / 600) / scale(0.4))),
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;div style=&quot;position:relative;max-width:600px&quot;&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-vt85n2&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;top:0;width:100%&quot;&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transformA1([x, y, { innerHeight }]) {
+  return [
+    x + innerHeight - y,
+    innerHeight * 0.5 + y * 0.5 + x / 3,
+  ];
+}
+function transformA2([x, y]) {
+  return [
+    x,
+    y + x / 3,
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;hr/&gt;&lt;p&gt;웹 폰트에 관심이 있으시면 다음 자료도 참고하세요.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;a href=&quot;https://googlefonts.github.io/korean/&quot;&gt;Google Fonts + 한국어&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;https://d2.naver.com/helloworld/4969726&quot;&gt;웹 폰트 사용과 최적화의 최근 동향&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Playing with Fonts]]></title><description><![CDATA[Google Fonts + 한국어  site has some amazing typographic effects. Some of them can't be implemented with CSS alone, so I wanted to make them…]]></description><link>https://github.com/bluewings/dev-dad/en/playing-with-fonts/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/en/playing-with-fonts/</guid><pubDate>Sun, 23 Jun 2019 01:58:01 GMT</pubDate><content:encoded>&lt;div&gt;&lt;p&gt;&lt;a href=&quot;https://googlefonts.github.io/korean/&quot;&gt;Google Fonts + 한국어&lt;/a&gt; site has some amazing typographic effects. Some of them can’t be implemented with CSS alone, so I wanted to make them myself.&lt;/p&gt;&lt;p&gt;Among them, I have implemented waving text in code. The result of the coding is as follows.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;p&gt;To implement the effects, the following steps have been taken: The detailed step-by-step process is described below.&lt;/p&gt;&lt;ol&gt;&lt;li&gt;Converts text to vector.&lt;/li&gt;&lt;li&gt;Draw text with SVG or Canvas.&lt;/li&gt;&lt;li&gt;Use transform function to change the path.&lt;/li&gt;&lt;li&gt;Repeat step 3. (Animation)&lt;/li&gt;&lt;/ol&gt;&lt;hr/&gt;&lt;h2&gt;1. Converts text to vector.&lt;/h2&gt;&lt;p&gt;I searched for “font parser” and found &lt;a href=&quot;https://opentype.js.org/&quot;&gt;opentype.js&lt;/a&gt;.&lt;/p&gt;&lt;blockquote&gt;&lt;p&gt;opentype.js is a JavaScript parser and writer for TrueType and OpenType fonts.&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;After loading the font using the &lt;a href=&quot;https://github.com/opentypejs/opentype.js#fontstringtoglyphsstring&quot;&gt;API&lt;/a&gt;, you can see how to bring the glyph of the letter.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import { load } from &amp;#x27;opentype.js&amp;#x27;;
+
+load(&amp;#x27;montserrat.woff&amp;#x27;, (err, font) =&amp;gt; {
+  const glyphs = font.stringToGlyphs(&amp;#x27;Developer&amp;#x27;);
+  console.log(glyphs);
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;div&gt;&lt;/div&gt;&lt;p&gt;If you check the execution results, you can get information about the glyphs for each character, and there is information in path.commands that can be drawn. (Click each node to see detailed information)&lt;/p&gt;&lt;h2&gt;2. Draw text with SVG or Canvas.&lt;/h2&gt;&lt;p&gt;You can draw the SVG path with the information contained in path.commands. If you use Canvas, you can use the following method. &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo&quot;&gt;moveTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo&quot;&gt;lineTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo&quot;&gt;quadraticCurveTo&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo&quot;&gt;bezierCurveTo&lt;/a&gt;&lt;/p&gt;&lt;p&gt;I drew a path and point in SVG with path.commands information.&lt;/p&gt;&lt;p&gt;REF: &lt;a href=&quot;https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/Paths#%EC%84%A0(Line)_%EB%AA%85%EB%A0%B9%EC%96%B4&quot;&gt;Paths - SVG: Scalable Vector Graphics | MDN&lt;/a&gt;&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;outline css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;h2&gt;3. Use transform function to change the path.&lt;/h2&gt;&lt;p&gt;I searched for a library called &lt;a href=&quot;https://benjamminf.github.io/warpjs/&quot;&gt;Warp.js&lt;/a&gt;. This library allows you to distort the path of SVG into a form using user-defined functions. See &lt;a href=&quot;https://codepen.io/benjamminf/pen/NpZLeb&quot;&gt;Warp.js example&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Using trigonometric functions seems to be able to show shaking effects. In the result of the previous step, the following results are obtained when the y coordinate is converted using the Sine function. Voila!&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const warp = new Warp(svg);
+
+warp.transform(([ x, y ]) =&amp;gt; [ x, y + 15 * Math.sin(x / 50) ]);
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;outline css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;h2&gt;4. Repeat step 3. (Animation)&lt;/h2&gt;&lt;p&gt;If you keep moving the Sine function and draw it, you can see the following animation.&lt;/p&gt;&lt;div class=&quot;Trigonometric-module--root--2SaYN&quot;&gt;&lt;/div&gt;&lt;p&gt;Applying this to the text is as follows.&lt;/p&gt;&lt;p&gt;If you want to maintain the same speed regardless of the device’s performance, you can use the offset value of time as a factor.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const warp = new Warp(svg);
+
+// Apply x and y values to the third and fourth arguments
+// to remember the coordinates of the original before applying the animation
+warp.transform(([x, y]) =&amp;gt; [x, y, x, y]);
+
+// start time
+const startAt = new Date().valueOf();
+
+function animate() {
+  // time of current frame
+  const offset = (new Date().valueOf() - startAt) / 1000;
+  // compute coordinates from the original coordinate values and pass the original values intact
+  warp.transform(([x, y, ox, oy]) =&amp;gt; [
+    x,
+    oy + 15 * Math.sin(x / 50 + offset),
+    ox,
+    oy,
+  ]);
+  requestAnimationFrame(animate);
+}
+
+animate();
+&lt;/code&gt;&lt;/pre&gt;&lt;hr/&gt;&lt;h2&gt;Other transform functions&lt;/h2&gt;&lt;p&gt;You can change the transform function to create different effects.&lt;/p&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { innerHeight, scale, offset }]) {
+  const wave = scale(0.2);
+  const z = Math.max(0, y / innerHeight - 0.1);
+  return [
+    x,
+    y + wave * Math.sin((x + scale(offset) / 400 / 2) / scale(0.5)) * z,
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;div style=&quot;height:2.5rem&quot;&gt;&lt;/div&gt;&lt;div style=&quot;margin-bottom:1.75rem&quot;&gt;&lt;div class=&quot;css-syonx7&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.2);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 1000) / scale(0.5)),
+    y + wave * Math.sin((x + scale(offset) / 1000) / scale(0.5)),
+  ];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[이름 궁합 계산기]]></title><description><![CDATA[내가 30년 전 초등학교 다닐 적에 하던 놀이 중에 아직도 남아있는 것들이 있다. 이름의 획 수를 가지고 궁합을 계산하는 것도 그중의 하나인데, 아들과 함께 코드로 작성해보았다.]]></description><link>https://github.com/bluewings/dev-dad/name-compatibility/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/name-compatibility/</guid><pubDate>Thu, 06 Jun 2019 10:38:05 GMT</pubDate><content:encoded>&lt;div&gt;&lt;gatsby--context args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--context&gt;&lt;p&gt;내가 30년 전 초등학교 다닐 적에 하던 놀이 중에 아직도 남아있는 것들이 있다. 이름의 획 수를 가지고 궁합을 계산하는 것도 그중의 하나인데, 아들과 함께 코드로 작성해보았다.&lt;/p&gt;&lt;h2&gt;데모&lt;/h2&gt;&lt;p&gt;입력 창에 두 개 이상의 이름을 입력하시면 각 이름 간의 궁합을 확인할 수 있습니다. (한글 이름만 가능합니다.)&lt;/p&gt;&lt;div class=&quot;Calculator-module--root--19oeD&quot;&gt;&lt;div class=&quot;Calculator-module--input--1DqQU&quot;&gt;&lt;textarea autoComplete=&quot;off&quot; spellcheck=&quot;false&quot; style=&quot;height:0&quot;&gt;박찬욱 이선균 이정은 송강호 박소담 정은지 봉준호 현승민&lt;/textarea&gt;&lt;/div&gt;&lt;div class=&quot;Calculator-module--showcase--4I_RO&quot;&gt;&lt;div class=&quot;Calculator-module--rank--3FziT&quot;&gt;&lt;div class=&quot;Calculator-module--search--QLjJJ&quot;&gt;&lt;input type=&quot;text&quot; value=&quot;&quot;/&gt;&lt;div class=&quot;Calculator-module--icon--2dxjg&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 20 20&quot;&gt;&lt;path d=&quot;M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z&quot;&gt;&lt;/path&gt;&lt;/svg&gt;&lt;/div&gt;&lt;/div&gt;&lt;ul&gt;&lt;li data-case-index=&quot;0&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;91&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;1&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;83&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;2&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;82&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;3&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;71&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;4&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;70&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;5&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;61&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;6&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;59&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;7&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;58&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;8&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;56&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;9&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;55&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;10&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;47&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;11&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;46&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;12&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;45&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;13&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;40&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;14&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;39&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;15&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;16&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;36&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;17&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;35&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;18&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;32&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;19&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;31&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;20&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;24&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이선균&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;21&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;22&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박찬욱&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;22&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;21&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;23&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;19&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;24&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;16&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;봉준호&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;25&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;송강호&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;정은지&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;26&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;현승민&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;li data-case-index=&quot;27&quot; class=&quot;&quot;&gt;&lt;div class=&quot;Calculator-module--num--21m2f&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;Calculator-module--name--1zBdP&quot;&gt;&lt;a href=&quot;&quot;&gt;이정은&lt;/a&gt; , &lt;a href=&quot;&quot;&gt;박소담&lt;/a&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&lt;div class=&quot;Calculator-module--calc--1m1x4&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;h2&gt;코드&lt;/h2&gt;&lt;p&gt;입력받은 이름의 각 글자의 획수를 알아내는 부분이 조금 생소할 뿐, 점수를 계산하는 방법은 단계를 거치면서 합산한 결과를 10으로 나눈 나머지를 특정 조건이 될 때까지 반복하면 된다.&lt;/p&gt;&lt;h3&gt;초성, 중성, 종성 분리&lt;/h3&gt;&lt;p&gt;아래와 같이 코드를 작성해서 실행해보면 UTF-16 코드 상에서 한글이 어떤 순서로 배열되어 있는지 짐작할 수 있다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const BASE = &amp;#x27;가&amp;#x27;.charCodeAt(0);  // 한글 코드 시작: 44032
+
+Array(100)
+  .fill()
+  .map((e, i) =&amp;gt; BASE + i)
+  .map((i) =&amp;gt; String.fromCharCode(i))
+  .join(&amp;#x27; &amp;#x27;);
+// 가 각 갂 갃 간 갅 갆 갇 갈 갉 갊 갋 갌 갍 갎 갏 감 갑 값 갓 갔 강 갖 갗 갘 같 갚 갛
+// 개 객 갞 갟 갠 갡 갢 갣 갤 갥 갦 갧 갨 갩 갪 갫 갬 갭 갮 갯 갰 갱 갲 갳 갴 갵 갶 갷
+// 갸 갹 갺 갻 갼 갽 갾 갿 걀 걁 걂 걃 걄 걅 걆 걇 걈 걉 걊 걋 걌 걍 걎 걏 걐 걑 걒 걓
+// 걔 걕 걖 걗 걘 걙 걚 걛 걜 걝 걞 걟 걠 걡 걢 걣 ...
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;이를 바탕으로 초성, 중성, 종성을 분리하고, 각각의 획 수를 반환하는 함수를 작성하였다. (각 자소의 획은 직접 세어 객체로 만들어두었다.)&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const BASE = &amp;#x27;가&amp;#x27;.charCodeAt(0);  // 한글 코드 시작: 44032
+
+const INITIALS = [&amp;#x27;ㄱ&amp;#x27;, &amp;#x27;ㄲ&amp;#x27;, &amp;#x27;ㄴ&amp;#x27;, &amp;#x27;ㄷ&amp;#x27;, &amp;#x27;ㄸ&amp;#x27;, &amp;#x27;ㄹ&amp;#x27;, &amp;#x27;ㅁ&amp;#x27;, &amp;#x27;ㅂ&amp;#x27;, &amp;#x27;ㅃ&amp;#x27;, &amp;#x27;ㅅ&amp;#x27;, &amp;#x27;ㅆ&amp;#x27;, &amp;#x27;ㅇ&amp;#x27;, &amp;#x27;ㅈ&amp;#x27;, &amp;#x27;ㅉ&amp;#x27;, &amp;#x27;ㅊ&amp;#x27;, &amp;#x27;ㅋ&amp;#x27;, &amp;#x27;ㅌ&amp;#x27;, &amp;#x27;ㅍ&amp;#x27;, &amp;#x27;ㅎ&amp;#x27;];
+const MEDIALS = [&amp;#x27;ㅏ&amp;#x27;, &amp;#x27;ㅐ&amp;#x27;, &amp;#x27;ㅑ&amp;#x27;, &amp;#x27;ㅒ&amp;#x27;, &amp;#x27;ㅓ&amp;#x27;, &amp;#x27;ㅔ&amp;#x27;, &amp;#x27;ㅕ&amp;#x27;, &amp;#x27;ㅖ&amp;#x27;, &amp;#x27;ㅗ&amp;#x27;, &amp;#x27;ㅘ&amp;#x27;, &amp;#x27;ㅙ&amp;#x27;, &amp;#x27;ㅚ&amp;#x27;, &amp;#x27;ㅛ&amp;#x27;, &amp;#x27;ㅜ&amp;#x27;, &amp;#x27;ㅝ&amp;#x27;, &amp;#x27;ㅞ&amp;#x27;, &amp;#x27;ㅟ&amp;#x27;, &amp;#x27;ㅠ&amp;#x27;, &amp;#x27;ㅡ&amp;#x27;, &amp;#x27;ㅢ&amp;#x27;, &amp;#x27;ㅣ&amp;#x27;];
+const FINALES = [&amp;#x27;&amp;#x27;, &amp;#x27;ㄱ&amp;#x27;, &amp;#x27;ㄲ&amp;#x27;, &amp;#x27;ㄳ&amp;#x27;, &amp;#x27;ㄴ&amp;#x27;, &amp;#x27;ㄵ&amp;#x27;, &amp;#x27;ㄶ&amp;#x27;, &amp;#x27;ㄷ&amp;#x27;, &amp;#x27;ㄹ&amp;#x27;, &amp;#x27;ㄺ&amp;#x27;, &amp;#x27;ㄻ&amp;#x27;, &amp;#x27;ㄼ&amp;#x27;, &amp;#x27;ㄽ&amp;#x27;, &amp;#x27;ㄾ&amp;#x27;, &amp;#x27;ㄿ&amp;#x27;, &amp;#x27;ㅀ&amp;#x27;, &amp;#x27;ㅁ&amp;#x27;, &amp;#x27;ㅂ&amp;#x27;, &amp;#x27;ㅄ&amp;#x27;, &amp;#x27;ㅅ&amp;#x27;, &amp;#x27;ㅆ&amp;#x27;, &amp;#x27;ㅇ&amp;#x27;, &amp;#x27;ㅈ&amp;#x27;, &amp;#x27;ㅊ&amp;#x27;, &amp;#x27;ㅋ&amp;#x27;, &amp;#x27;ㅌ&amp;#x27;, &amp;#x27;ㅍ&amp;#x27;, &amp;#x27;ㅎ&amp;#x27;];
+
+const STROKES = { &amp;#x27;&amp;#x27;: 0, &amp;#x27;ㄱ&amp;#x27;: 2, &amp;#x27;ㄲ&amp;#x27;: 4, &amp;#x27;ㄴ&amp;#x27;: 2, &amp;#x27;ㄷ&amp;#x27;: 3, &amp;#x27;ㄸ&amp;#x27;: 6, &amp;#x27;ㄹ&amp;#x27;: 5, &amp;#x27;ㅁ&amp;#x27;: 4, &amp;#x27;ㅂ&amp;#x27;: 4, &amp;#x27;ㅃ&amp;#x27;: 8, &amp;#x27;ㅅ&amp;#x27;: 2, &amp;#x27;ㅆ&amp;#x27;: 4, &amp;#x27;ㅇ&amp;#x27;: 1, &amp;#x27;ㅈ&amp;#x27;: 3, &amp;#x27;ㅉ&amp;#x27;: 6, &amp;#x27;ㅊ&amp;#x27;: 4, &amp;#x27;ㅋ&amp;#x27;: 3, &amp;#x27;ㅌ&amp;#x27;: 4, &amp;#x27;ㅍ&amp;#x27;: 4, &amp;#x27;ㅎ&amp;#x27;: 3, &amp;#x27;ㄳ&amp;#x27;: 4, &amp;#x27;ㄵ&amp;#x27;: 5, &amp;#x27;ㄶ&amp;#x27;: 5, &amp;#x27;ㄺ&amp;#x27;: 7, &amp;#x27;ㄻ&amp;#x27;: 9, &amp;#x27;ㄼ&amp;#x27;: 9, &amp;#x27;ㄽ&amp;#x27;: 7, &amp;#x27;ㄾ&amp;#x27;: 9, &amp;#x27;ㄿ&amp;#x27;: 9, &amp;#x27;ㅀ&amp;#x27;: 8, &amp;#x27;ㅄ&amp;#x27;: 6, &amp;#x27;ㅏ&amp;#x27;: 2, &amp;#x27;ㅐ&amp;#x27;: 3, &amp;#x27;ㅑ&amp;#x27;: 3, &amp;#x27;ㅒ&amp;#x27;: 4, &amp;#x27;ㅓ&amp;#x27;: 2, &amp;#x27;ㅔ&amp;#x27;: 3, &amp;#x27;ㅕ&amp;#x27;: 3, &amp;#x27;ㅖ&amp;#x27;: 4, &amp;#x27;ㅗ&amp;#x27;: 2, &amp;#x27;ㅘ&amp;#x27;: 4, &amp;#x27;ㅙ&amp;#x27;: 5, &amp;#x27;ㅚ&amp;#x27;: 3, &amp;#x27;ㅛ&amp;#x27;: 3, &amp;#x27;ㅜ&amp;#x27;: 2, &amp;#x27;ㅝ&amp;#x27;: 4, &amp;#x27;ㅞ&amp;#x27;: 5, &amp;#x27;ㅟ&amp;#x27;: 3, &amp;#x27;ㅠ&amp;#x27;: 3, &amp;#x27;ㅡ&amp;#x27;: 1, &amp;#x27;ㅢ&amp;#x27;: 2, &amp;#x27;ㅣ&amp;#x27;: 1 };
+
+function getSymbol(char) {
+  if (!char.match(/[ㄱ-ㅎ가-힣]/)) {
+    return false;
+  }
+  let initial = &amp;#x27;&amp;#x27;;
+  let medial = &amp;#x27;&amp;#x27;;
+  let finale = &amp;#x27;&amp;#x27;;
+  if (char.match(/[ㄱ-ㅎ]/)) {
+    initial = char;
+  } else {
+    const tmp = char.charCodeAt(0) - BASE;
+    const finaleOffset = tmp % FINALES.length;
+    const medialOffset = ((tmp - finaleOffset) / FINALES.length) % MEDIALS.length;
+    const initialOffset = ((tmp - finaleOffset) / FINALES.length - medialOffset) / MEDIALS.length;
+    initial = INITIALS[initialOffset];
+    medial = MEDIALS[medialOffset];
+    finale = FINALES[finaleOffset];
+  }
+  const initialStrokes = STROKES[initial];
+  const medialStrokes = STROKES[medial];
+  const finaleStrokes = STROKES[finale];
+  return {
+    initial,
+    medial,
+    finale,
+    initialStrokes,
+    medialStrokes,
+    finaleStrokes,
+    numOfStrokes: initialStrokes + medialStrokes + finaleStrokes,
+  };
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;h3&gt;스코어 계산&lt;/h3&gt;&lt;p&gt;각 글자의 획수를 알 수 있으면 숫자 궁합 점수는 아래와 같이 쉽게 계산할 수 있다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function getScore(name1, name2) {
+  const symbols1 = name1.match(/[sS]/g).map((char) =&amp;gt; [char, getSymbol(char).numOfStrokes]);
+  const symbols2 = name2.match(/[sS]/g).map((char) =&amp;gt; [char, getSymbol(char).numOfStrokes]);
+  const maxLen = Math.max(symbols1.length, symbols2.length);
+
+  const [chars, numbers] = Array(maxLen)
+    .fill()
+    .reduce(
+      ([accum1, accum2], e, i) =&amp;gt; {
+        const [char1, num1] = symbols1[i] || [&amp;#x27;&amp;#x27;, 0];
+        const [char2, num2] = symbols2[i] || [&amp;#x27;&amp;#x27;, 0];
+        return [[...accum1, char1, char2], [...accum2, num1, num2]];
+      },
+      [[], []],
+    );
+
+  let nums = numbers.slice();
+  const stages = [nums];
+  while (nums.length &amp;gt; 2 &amp;amp;&amp;amp; nums.join(&amp;#x27;&amp;#x27;) !== &amp;#x27;100&amp;#x27;) {
+    nums = nums.reduce((a, e, i, arr) =&amp;gt; {
+      if (i &amp;lt; arr.length - 1) {
+        return [...a, (e + arr[i + 1]) % 10];
+      }
+      return a;
+    }, []);
+    stages.push(nums);
+  }
+
+  return { chars, stages, score: ~~stages.slice(-1)[0].join(&amp;#x27;&amp;#x27;) };
+}
+// 배성재, 장예원 →
+// {
+//   &amp;quot;chars&amp;quot;: [&amp;quot;배&amp;quot;, &amp;quot;장&amp;quot;, &amp;quot;성&amp;quot;, &amp;quot;예&amp;quot;, &amp;quot;재&amp;quot;, &amp;quot;원&amp;quot;],
+//   &amp;quot;stages&amp;quot;:[
+//     [7, 6, 5, 5, 6, 7],
+//     [3, 1, 0, 1, 3],
+//     [4, 1, 1, 4],
+//     [5, 2, 5],
+//     [7, 7]
+//   ],
+//   &amp;quot;score&amp;quot;: 77
+// }
+&lt;/code&gt;&lt;/pre&gt;&lt;h2&gt;Chord Diagram&lt;/h2&gt;&lt;p&gt;데이터를 행렬(Matrix)로 변경하면 &lt;a href=&quot;https://d3js.org/&quot;&gt;D3.js&lt;/a&gt;를 사용하여 &lt;a href=&quot;https://observablehq.com/collection/@d3/d3-chord&quot;&gt;Chord Diagram&lt;/a&gt;을 그릴 수 있다.&lt;/p&gt;&lt;gatsby--grid args=&quot;5&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;  {
+    &amp;quot;name1&amp;quot;: &amp;quot;공효진&amp;quot;, &amp;quot;name2&amp;quot;: &amp;quot;차태현&amp;quot;,
+    &amp;quot;score1&amp;quot;: 94, &amp;quot;score2&amp;quot;: 7
+  },
+  {
+    &amp;quot;name1&amp;quot;: &amp;quot;공효진&amp;quot;, &amp;quot;name2&amp;quot;: &amp;quot;김수현&amp;quot;,
+    &amp;quot;score1&amp;quot;: 17, &amp;quot;score2&amp;quot;: 35
+  },
+  {
+    &amp;quot;name1&amp;quot;: &amp;quot;차태현&amp;quot;, &amp;quot;name2&amp;quot;: &amp;quot;김수현&amp;quot;,
+    &amp;quot;score1&amp;quot;: 9, &amp;quot;score2&amp;quot;: 14
+  }
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot;&gt;[
+  [0, 94, 17],
+  [7, 0, 9],
+  [35, 14, 0]
+]
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA['캠릿브지 대학의 연결구과' 변환기]]></title><description><![CDATA[옛날에 인터넷에 펌글로 돌아다니던 캠릿브지 대학의 연결구과 변환기를 만들어보았다.]]></description><link>https://github.com/bluewings/dev-dad/word-superiority-effect/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/word-superiority-effect/</guid><pubDate>Tue, 04 Jun 2019 12:28:11 GMT</pubDate><content:encoded>&lt;div&gt;&lt;p&gt;옛날에 인터넷에 펌글로 돌아다니던 &lt;a href=&quot;https://namu.wiki/w/%EC%BA%A0%EB%A6%BF%EB%B8%8C%EC%A7%80%20%EB%8C%80%ED%95%99%EC%9D%98%20%EC%97%B0%EA%B2%B0%EA%B5%AC%EA%B3%BC&quot;&gt;캠릿브지 대학의 연결구과&lt;/a&gt; 변환기를 만들어보았다.&lt;/p&gt;&lt;p&gt;정말 심심하거나, 컴퓨터가 내 글을 수집해서 정리하는 게 싫을 때 사용하면 된다.&lt;/p&gt;&lt;hr/&gt;&lt;p&gt;왼쪽에 입력하면 오른쪽에 변환 결과가 표시됩니다.&lt;/p&gt;&lt;div class=&quot;Converter-module--root--2GrDg&quot;&gt;&lt;div class=&quot;Converter-module--input--139Fj&quot;&gt;&lt;textarea style=&quot;height:0&quot;&gt;캠브릿지 대학의 연구결과에 따르면, 한 단어 안에서 글자가 어떤 순서로 배열되어 있는지는 중요하지 않고, 첫 번째와 마지막 글자가 올바른 위치에 있는 것이 중요하다고한다.
+
+나머지 글자들은 완전히 엉망진창의 순서로 되어 있을지라도 당신은 아무 문제 없이 이것을 읽을 수 있다.
+
+왜냐하면, 인간의 두뇌는 모든 글자를 하나하나 읽는 것이 아니라 단어 하나를 전체로 인식하기 때문이다.&lt;/textarea&gt;&lt;/div&gt;&lt;div class=&quot;Converter-module--output--SuhRc&quot;&gt;캠&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;릿&lt;/span&gt;&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;브&lt;/span&gt;지 대학의 연&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;결&lt;/span&gt;&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;구&lt;/span&gt;과에 따르면, 한 단어 안에서 글자가 어떤 순서로 배&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;되&lt;/span&gt;&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;열&lt;/span&gt;어 있&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;지&lt;/span&gt;&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;는&lt;/span&gt;는 중&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;하&lt;/span&gt;&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;요&lt;/span&gt;지 않고, 첫 번째와 마지막 글자가 올바른 위치에 있는 것이 중&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;한&lt;/span&gt;하다고&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;요&lt;/span&gt;다.
+
+나머지 글&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;들&lt;/span&gt;&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;자&lt;/span&gt;은 완전히 엉&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;창&lt;/span&gt;진&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;망&lt;/span&gt;의 순서로 되어 있&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;라&lt;/span&gt;지&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;을&lt;/span&gt;도 당신은 아무 문제 없이 이것을 읽을 수 있다.
+
+왜&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;하&lt;/span&gt;&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;냐&lt;/span&gt;면, 인간의 두뇌는 모든 글자를 하&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;하&lt;/span&gt;&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;나&lt;/span&gt;나 읽는 것이 아니라 단어 하나를 전체로 인&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;하&lt;/span&gt;&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;식&lt;/span&gt;기 때&lt;span class=&quot;Converter-module--i1--Zwl38&quot;&gt;이&lt;/span&gt;&lt;span class=&quot;Converter-module--i2--3x6nC&quot;&gt;문&lt;/span&gt;다.&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;p&gt;변환에 사용한 코드는 다음과 같습니다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;function jumble(word) {
+  const letters = word.match(/[\s\S]/g);
+  const [i1, i2] = letters
+    .map((e, i) =&amp;gt; i)
+    .slice(1, -1)
+    .map((e) =&amp;gt; [Math.random(), e])
+    .sort((a, b) =&amp;gt; a[0] - b[0])
+    .map((e) =&amp;gt; e[1]);
+  if (i1 &amp;amp;&amp;amp; i2) {
+    const tmp = letters[i1];
+    letters[i1] = letters[i2];
+    letters[i2] = tmp;
+  }
+  return letters.join(&amp;#x27;&amp;#x27;);
+}
+
+function makeDifficult(text) {
+  return text.replace(/[가-힣]+/g, jumble);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[타노스 이스터 에그 들여다보기]]></title><description><![CDATA[어벤져스 인피니티 워 엔드게임 개봉과 함께 구글은 검색 결과에 이스터 에그를 추가했다. 구글에서 ‘타노스(Thanos…]]></description><link>https://github.com/bluewings/dev-dad/thanos-explained/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/thanos-explained/</guid><pubDate>Fri, 10 May 2019 14:34:36 GMT</pubDate><content:encoded>&lt;div&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;p&gt;어벤져스 인피니티 워 엔드게임 개봉과 함께 구글은 검색 결과에 이스터 에그를 추가했다. 구글에서 ‘타노스(Thanos)‘를 검색하면 오른쪽에 인피니티 건틀릿 아이콘이 보이고, 이를 클릭하면 검색 결과의 절반이 순차적으로 가루가 되어 사라진다.&lt;/p&gt;&lt;p&gt;이스터 에그를 보던 아들이 “아빠도 저런 거 할 수 있어?”라고 묻는다. “아마도?”라고 대답하긴 했는데 막상 구현하려니 어떻게 구현해야 할지 아이디어가 떠오르질 않는다. 결국 브라우저의 개발자 도구를 사용하여 어떻게 작동하는지 살펴보았다. 이스터 에그가 화려해서 복잡할 것으로 예상했지만, 예상과 달리 매우 간단하게 구현되어있었다.&lt;/p&gt;&lt;p&gt;데모를 보려면, 오른쪽의 인피니티 건틀릿을 클릭하세요.&lt;/p&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;Example-module--root--2-Bea&quot;&gt;&lt;div class=&quot;Example-module--inner--3Ucsb&quot;&gt;&lt;div class=&quot;Example-module--sample--2W9WG &quot;&gt;&lt;div&gt;&lt;div class=&quot;Sample-module--root--1HLTX&quot;&gt;&lt;div style=&quot;float:right&quot;&gt;&lt;button class=&quot;Sample-module--btnShuffle--1U6fy&quot; type=&quot;button&quot;&gt;&lt;i class=&quot;fa fa-fw fa-random&quot;&gt;&lt;/i&gt;&lt;/button&gt;&lt;/div&gt;&lt;div style=&quot;clear:both&quot;&gt;&lt;/div&gt;&lt;div style=&quot;position:relative&quot;&gt;&lt;div&gt;&lt;div class=&quot;Heroes-module--cardWrap--1NO3i&quot;&gt;&lt;div class=&quot;Heroes-module--card--t-ICy&quot;&gt;&lt;div class=&quot;Heroes-module--image---DbNd&quot;&gt;&lt;img src=&quot;static/star-lord-173c1c6f52787c6624986a13da73f00d.png&quot; alt=&quot;avengers&quot;/&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--text--28iiN&quot;&gt;&lt;h3&gt;STAR LORD&lt;/h3&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--card--t-ICy&quot;&gt;&lt;div class=&quot;Heroes-module--image---DbNd&quot;&gt;&lt;img src=&quot;static/falcon-409f5d6fa3da79c428ef44785866a93e.png&quot; alt=&quot;avengers&quot;/&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--text--28iiN&quot;&gt;&lt;h3&gt;FALCON&lt;/h3&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example-module--gimmick--3XBKF Example-module--invisible--32ion&quot;&gt;&lt;div class=&quot;Gimmick-module--container--208Sf Gimmick-module--noFrame--9GD9e&quot; style=&quot;display:block&quot;&gt;&lt;div class=&quot;cloned&quot; style=&quot;opacity:0;margin-top:-57px&quot;&gt;&lt;div class=&quot;Gimmick-module--single--3716-&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;/div&gt;&lt;div style=&quot;visibility:visible&quot;&gt;&lt;div class=&quot;Gimmick-module--layers--31lnz&quot;&gt;&lt;div style=&quot;transform-origin:0 0;transform-style:preserve-3d;width:0;height:0&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example-module--gauntlet--1smjK&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;hr/&gt;&lt;p&gt;다음 세 단계로 웹 문서를 가루로 만들 수 있다.&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;strong&gt;스크린샷 캡쳐&lt;/strong&gt;: &lt;a href=&quot;https://html2canvas.hertzen.com/&quot;&gt;html2canvas&lt;/a&gt; 라이브러리를 사용하여 원본 엘리먼트의 스크린샷을 캡처한다.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;다수의 레이어로 분할&lt;/strong&gt;: 원본과 동일한 크기의 이미지 데이터 인스턴스를 생성하고, 원본 스크린샷의 각 픽셀의 데이터를 읽어서 임의의 이미지 데이터 인스턴스로 옮긴다. 픽셀 데이터가 반영된 이후에 이를 각 캔버스에 반영한다.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;각 레이어를 회전하고 이동&lt;/strong&gt;: 각 캔버스 레이어를 임의의 각도로 회전시키고, 불투명도를 조정하여 점차 보이지 않게 한다. 이 과정에서 각 레이어에 효과를 순차적으로 주면 특정 방향으로 이동하는 효과를 볼 수 있다.&lt;/li&gt;&lt;/ol&gt;&lt;hr/&gt;&lt;p&gt;코드와 함께 예제를 단계별로 자세히 살펴봅시다.&lt;/p&gt;&lt;gatsby--context args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--context&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h2&gt;1. 스크린샷 캡쳐&lt;/h2&gt;&lt;p&gt;오른쪽의 예제는 다음과 같은 HTML 코드로 작성되어있다.&lt;/p&gt;&lt;div class=&quot;prism-code-wrap gatsby-highlight&quot;&gt;&lt;pre class=&quot;prism-code language-html&quot;&gt;&lt;div class=&quot;token-line&quot;&gt;&lt;span class=&quot;token plain&quot;&gt; &lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;다음 단계의 작업을 위해서 HTML 계층 구조를 가진 엘리먼트를 이미지로 변환하는 과정이 필요한데, &lt;a href=&quot;https://html2canvas.hertzen.com/&quot;&gt;html2canvas&lt;/a&gt; 라이브러리를 사용하면 특정 HTML 엘리먼트의 스크린샷을 얻을 수 있다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import html2canvas from &amp;#x27;html2canvas&amp;#x27;;
+
+html2canvas(element, {
+  backgroundColor: null,
+}).then((canvas) =&amp;gt; {
+  // doSomething(canvas);
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;p&gt;위의 코드를 실행하여 대상 엘리먼트의 스크린샷을 생성한다. (찰칵)&lt;/p&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;sticky&quot; style=&quot;top:0&quot;&gt;&lt;div&gt;&lt;div class=&quot;Sample-module--root--1HLTX&quot;&gt;&lt;div style=&quot;float:right&quot;&gt;&lt;button class=&quot;Sample-module--btnShuffle--1U6fy&quot; type=&quot;button&quot;&gt;&lt;i class=&quot;fa fa-fw fa-random&quot;&gt;&lt;/i&gt;&lt;/button&gt;&lt;/div&gt;&lt;div style=&quot;clear:both&quot;&gt;&lt;/div&gt;&lt;div style=&quot;position:relative&quot;&gt;&lt;div&gt;&lt;div class=&quot;Heroes-module--root--2S2ql&quot;&gt;&lt;a href=&quot;https://www.marvel.com/characters/hawkeye-clint-barton&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;&lt;h3&gt;HAWKEYE / CLINT BARTON&lt;/h3&gt;&lt;cite&gt;https://www.marvel.com/characters/hawkeye-clint-barton&lt;/cite&gt;&lt;/a&gt;&lt;p&gt;A master marksman and longtime friend of Black Widow, Clint Barton serves as the Avengers’ amazing archer.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;h2&gt;2. 다수의 레이어로 분할&lt;/h2&gt;&lt;p&gt;이번 단계에서는 이전 단계에서 얻은 스크린샷의 각 픽셀을 다수의 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt;에 나누어 그린다.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt;에서는 영역의 픽셀 데이터를 나타내기 위해 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; 인터페이스를 사용하는데, 아래의 각 단계에서는 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;를 생성하고, 읽고, 옮기는 작업을 수행할 예정이다.&lt;/p&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;원본과 동일한 크기의 이미지 데이터 인스턴스를 생성한다.&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/createImageData&quot;&gt;createImageData&lt;/a&gt; 함수를 사용하여 원본과 동일한 크기의 빈 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;를 정해진 개수만큼 만든다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const ctx = canvas.getContext(&amp;#x27;2d&amp;#x27;);
+const width = canvas.width;
+const height = canvas.height;
+
+const layers = new Array(numOfLayers)
+  .fill(null)
+  .map(() =&amp;gt; ctx.createImageData(width, height));
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;원본 스크린샷의 각 픽셀의 데이터를 읽어서 임의의 이미지 데이터 인스턴스로 옮긴다.&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/getImageData&quot;&gt;getImageData&lt;/a&gt; 함수로 원본 스크린샷의 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;를 가져온 뒤, 모든 픽셀을 순회하면서 각 픽셀의 정보를 임의의 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;로 옮긴다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const imageData = ctx.getImageData(0, 0, width, height);
+for (let x = 0; x &amp;lt; width; x += 1) {
+  for (let y = 0; y &amp;lt; height; y += 1) {
+    const i = Math.floor(
+      (numOfLayers * (Math.random() + (2 * x) / width)) / 3,
+    );
+    const p = 4 * (y * width + x);
+    for (let j = 0; j &amp;lt; 4; j += 1) {
+      layers[i].data[p + j] = imageData.data[p + j];
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;픽셀 데이터가 반영된 이후에 이를 각 캔버스에 반영한다.&lt;/h3&gt;&lt;p&gt;모든 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;가 준비되면 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt;를 만들고 해당 정보를 사용하여 그림을 그린다. 각 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; 레이어에 픽셀이 흩어져 있지만, 겹쳐서 보면 원본과 크게 다르지 않다.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;layers.map((layer) =&amp;gt; {
+  const clone = canvas.cloneNode();
+  clone.getContext(&amp;#x27;2d&amp;#x27;).putImageData(layer, 0, 0);
+  return clone;
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h2&gt;3. 각 레이어를 회전하고 이동&lt;/h2&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; 레이어가 준비가 되면 css의 &lt;a href=&quot;https://developer.mozilla.org/docs/Web/CSS/transform&quot;&gt;transform&lt;/a&gt;, &lt;a href=&quot;https://developer.mozilla.org/docs/Web/CSS/opacity&quot;&gt;opacity&lt;/a&gt;를 사용하여 각각의 레이어를 순차적으로 임의의 각도로 회전시키면서 투명하게 만들면 효과가 완성된다.&lt;/p&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;sticky&quot; style=&quot;top:0&quot;&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;div class=&quot;Example2-module--root--27Apy ex-ftkm3v1r&quot;&gt;&lt;div class=&quot;Example2-module--inner--250O0&quot;&gt;&lt;div class=&quot;Example2-module--sample--1uOSn &quot;&gt;&lt;div class=&quot;&quot; style=&quot;display:inline-block&quot;&gt;&lt;div class=&quot;Example2-module--sampleWrap--31puJ&quot;&gt;&lt;h1&gt;THE END&lt;/h1&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example2-module--gimmick--AOe0Z Example2-module--invisible--3PTAR&quot;&gt;&lt;div class=&quot;Gimmick-module--container--208Sf Gimmick-module--noFrame--9GD9e&quot; style=&quot;display:block&quot;&gt;&lt;div class=&quot;cloned&quot; style=&quot;opacity:0;margin-top:-57px&quot;&gt;&lt;div class=&quot;Gimmick-module--single--3716-&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;/div&gt;&lt;div style=&quot;visibility:visible&quot;&gt;&lt;div class=&quot;Gimmick-module--layers--31lnz&quot;&gt;&lt;div style=&quot;transform-origin:0 0;transform-style:preserve-3d;width:0;height:0&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Thanos Easter Egg, How it works]]></title><description><![CDATA[With the release of Avengers: Endgame (2019), Google added an Easter Egg to its search results page. When you search for Thanos on Google…]]></description><link>https://github.com/bluewings/dev-dad/en/thanos-explained/</link><guid isPermaLink="false">https://github.com/bluewings/dev-dad/en/thanos-explained/</guid><pubDate>Fri, 10 May 2019 14:34:36 GMT</pubDate><content:encoded>&lt;div&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;p&gt;With the release of Avengers: Endgame (2019), Google added an Easter Egg to its search results page. When you search for Thanos on Google, you will see an Infinity Gauntlet icon on the right, and when you click on it, half of the search results disappear into the dust.&lt;/p&gt;&lt;p&gt;My son sees Easter Egg and asks, “Dad, Can you do that?” I said, “Maybe?” But I do not have any idea how to implement it. After all, Using browser’s developer tools, I looked at how it works. Easter Egg was expected to be complex, but was implemented in a very simple way, contrary to my expectation.&lt;/p&gt;&lt;p&gt;To view the demo, click on the Infinity Guntlet on the right.&lt;/p&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;Example-module--root--2-Bea&quot;&gt;&lt;div class=&quot;Example-module--inner--3Ucsb&quot;&gt;&lt;div class=&quot;Example-module--sample--2W9WG &quot;&gt;&lt;div&gt;&lt;div class=&quot;Sample-module--root--1HLTX&quot;&gt;&lt;div style=&quot;float:right&quot;&gt;&lt;button class=&quot;Sample-module--btnShuffle--1U6fy&quot; type=&quot;button&quot;&gt;&lt;i class=&quot;fa fa-fw fa-random&quot;&gt;&lt;/i&gt;&lt;/button&gt;&lt;/div&gt;&lt;div style=&quot;clear:both&quot;&gt;&lt;/div&gt;&lt;div style=&quot;position:relative&quot;&gt;&lt;div&gt;&lt;div class=&quot;Heroes-module--cardWrap--1NO3i&quot;&gt;&lt;div class=&quot;Heroes-module--card--t-ICy&quot;&gt;&lt;div class=&quot;Heroes-module--image---DbNd&quot;&gt;&lt;img src=&quot;static/iron-man-ac58d19aec9385be459b92edbc0c9162.png&quot; alt=&quot;avengers&quot;/&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--text--28iiN&quot;&gt;&lt;h3&gt;IRON MAN&lt;/h3&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--card--t-ICy&quot;&gt;&lt;div class=&quot;Heroes-module--image---DbNd&quot;&gt;&lt;img src=&quot;static/black-panther-f3ca7bc9ff390254c2e5c9c1837df623.png&quot; alt=&quot;avengers&quot;/&gt;&lt;/div&gt;&lt;div class=&quot;Heroes-module--text--28iiN&quot;&gt;&lt;h3&gt;BLACK PANTHER&lt;/h3&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example-module--gimmick--3XBKF Example-module--invisible--32ion&quot;&gt;&lt;div class=&quot;Gimmick-module--container--208Sf Gimmick-module--noFrame--9GD9e&quot; style=&quot;display:block&quot;&gt;&lt;div class=&quot;cloned&quot; style=&quot;opacity:0;margin-top:-57px&quot;&gt;&lt;div class=&quot;Gimmick-module--single--3716-&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;/div&gt;&lt;div style=&quot;visibility:visible&quot;&gt;&lt;div class=&quot;Gimmick-module--layers--31lnz&quot;&gt;&lt;div style=&quot;transform-origin:0 0;transform-style:preserve-3d;width:0;height:0&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example-module--gauntlet--1smjK&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;hr/&gt;&lt;p&gt;Web pages turn into dust in three steps below.&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;strong&gt;Capture the screenshot&lt;/strong&gt;: Capture screenshot of original element using the &lt;a href=&quot;https://html2canvas.hertzen.com/&quot;&gt;html2canvas&lt;/a&gt; library.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Split into multiple layers&lt;/strong&gt;: Create an &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; instance of the same size as the original, and get the data from each pixel of the original screenshot and move it to any &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; instance. After &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; is reflected, update it on each &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt;.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Rotate and move layers&lt;/strong&gt;: Rotate each &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; layer at any angle and adjust the opacity to gradually become invisible.&lt;/li&gt;&lt;/ol&gt;&lt;hr/&gt;&lt;p&gt;Let’s take a step-by-step look at the example along with the code.&lt;/p&gt;&lt;gatsby--context args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--context&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h2&gt;1. Capture the screenshot&lt;/h2&gt;&lt;p&gt;The example on the right is written with the following HTML code.&lt;/p&gt;&lt;div class=&quot;prism-code-wrap gatsby-highlight&quot;&gt;&lt;pre class=&quot;prism-code language-html&quot;&gt;&lt;div class=&quot;token-line&quot;&gt;&lt;span class=&quot;token plain&quot;&gt; &lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;For the next step, you need to convert the element with the HTML hierarchy to an image. And you can use the &lt;a href=&quot;https://html2canvas.hertzen.com/&quot;&gt;html2canvas&lt;/a&gt; library to get a screenshot of a specific HTML element.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;import html2canvas from &amp;#x27;html2canvas&amp;#x27;;
+
+html2canvas(element, {
+  backgroundColor: null,
+}).then((canvas) =&amp;gt; {
+  // doSomething(canvas);
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;p&gt;Run the above code to create a screenshot of the target element. (click)&lt;/p&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;sticky&quot; style=&quot;top:0&quot;&gt;&lt;div&gt;&lt;div class=&quot;Sample-module--root--1HLTX&quot;&gt;&lt;div style=&quot;float:right&quot;&gt;&lt;button class=&quot;Sample-module--btnShuffle--1U6fy&quot; type=&quot;button&quot;&gt;&lt;i class=&quot;fa fa-fw fa-random&quot;&gt;&lt;/i&gt;&lt;/button&gt;&lt;/div&gt;&lt;div style=&quot;clear:both&quot;&gt;&lt;/div&gt;&lt;div style=&quot;position:relative&quot;&gt;&lt;div&gt;&lt;div class=&quot;Heroes-module--root--2S2ql&quot;&gt;&lt;a href=&quot;https://www.marvel.com/characters/thanos&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;&lt;h3&gt;THANOS&lt;/h3&gt;&lt;cite&gt;https://www.marvel.com/characters/thanos&lt;/cite&gt;&lt;/a&gt;&lt;p&gt;The Mad Titan Thanos quests across the universe in search of the Infinity Stones, intending to use their limitless power for shocking purposes.&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;h2&gt;2. Split into multiple layers&lt;/h2&gt;&lt;p&gt;At this stage, each pixel of the original screenshot is randomly divided into several &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvases&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;Canvas&lt;/a&gt; uses the &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; interface to represent pixel data in the area.  In each of the steps below, we will create, read, and move &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;.&lt;/p&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;Create an ImageData instance of the same size as the original.&lt;/h3&gt;&lt;p&gt;Use the &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/createImageData&quot;&gt;createImageData&lt;/a&gt; function to create a set number of empty &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; of the same size as the original.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const ctx = canvas.getContext(&amp;#x27;2d&amp;#x27;);
+const width = canvas.width;
+const height = canvas.height;
+
+const layers = new Array(numOfLayers)
+  .fill(null)
+  .map(() =&amp;gt; ctx.createImageData(width, height));
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;Get ImageData for each pixel in the original screenshot and move it to any ImageData instance.&lt;/h3&gt;&lt;p&gt;&lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/getImageData&quot;&gt;getImageData&lt;/a&gt; function gets the &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; of the original screenshot, then traverses all the pixels and moves each pixel’s &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; randomly to any &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; instance.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;const imageData = ctx.getImageData(0, 0, width, height);
+for (let x = 0; x &amp;lt; width; x += 1) {
+  for (let y = 0; y &amp;lt; height; y += 1) {
+    const i = Math.floor(
+      (numOfLayers * (Math.random() + (2 * x) / width)) / 3,
+    );
+    const p = 4 * (y * width + x);
+    for (let j = 0; j &amp;lt; 4; j += 1) {
+      layers[i].data[p + j] = imageData.data[p + j];
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h3&gt;After all ImageData is reflected, update on each canvas.&lt;/h3&gt;&lt;p&gt;When all &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt; is ready, create a &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; and draw a image using that &lt;a href=&quot;https://developer.mozilla.org/docs/Web/API/ImageData&quot;&gt;ImageData&lt;/a&gt;. Pixels are scattered in each &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; layer, but they are not much different from the original in layering.&lt;/p&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;layers.map((layer) =&amp;gt; {
+  const clone = canvas.cloneNode();
+  clone.getContext(&amp;#x27;2d&amp;#x27;).putImageData(layer, 0, 0);
+  return clone;
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;gatsby--section args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;h2&gt;3. Rotate and move layers&lt;/h2&gt;&lt;gatsby--section className=&quot;step&quot; args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--section&gt;&lt;p&gt;When the &lt;a href=&quot;https://developer.mozilla.org/docs/Web/HTML/Canvas&quot;&gt;canvas&lt;/a&gt; layer is ready, the effect is completed by using the css &lt;a href=&quot;https://developer.mozilla.org/docs/Web/CSS/transform&quot;&gt;transform&lt;/a&gt; and &lt;a href=&quot;https://developer.mozilla.org/docs/Web/CSS/opacity&quot;&gt;opacity&lt;/a&gt; to rotate each layer sequentially at any angle and make it transparent.&lt;/p&gt;&lt;gatsby--sectionend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--sectionend&gt;&lt;gatsby--grid args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--grid&gt;&lt;div class=&quot;sticky&quot; style=&quot;top:0&quot;&gt;&lt;/div&gt;&lt;gatsby--gridend args=&quot;&quot; params=&quot;[object Object]&quot;&gt;&lt;/gatsby--gridend&gt;&lt;div class=&quot;Example2-module--root--27Apy ex-24jqrs7d&quot;&gt;&lt;div class=&quot;Example2-module--inner--250O0&quot;&gt;&lt;div class=&quot;Example2-module--sample--1uOSn &quot;&gt;&lt;div class=&quot;&quot; style=&quot;display:inline-block&quot;&gt;&lt;div class=&quot;Example2-module--sampleWrap--31puJ&quot;&gt;&lt;h1&gt;THE END&lt;/h1&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;Example2-module--gimmick--AOe0Z Example2-module--invisible--3PTAR&quot;&gt;&lt;div class=&quot;Gimmick-module--container--208Sf Gimmick-module--noFrame--9GD9e&quot; style=&quot;display:block&quot;&gt;&lt;div class=&quot;cloned&quot; style=&quot;opacity:0;margin-top:-57px&quot;&gt;&lt;div class=&quot;Gimmick-module--single--3716-&quot;&gt;&lt;div&gt;&lt;div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;hr/&gt;&lt;/div&gt;&lt;div style=&quot;visibility:visible&quot;&gt;&lt;div class=&quot;Gimmick-module--layers--31lnz&quot;&gt;&lt;div style=&quot;transform-origin:0 0;transform-style:preserve-3d;width:0;height:0&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</content:encoded></item></channel></rss>
