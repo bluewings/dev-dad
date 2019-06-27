@@ -7,7 +7,7 @@ module.exports = {
     title: `아빠는 개발자`,
     author: `Cha Sung Won`,
     description: ``,
-    siteUrl: `https://github.com/bluewings/dev-dad`,
+    siteUrl: `https://bluewings.github.io/dev-dad/`,
     social: {
       twitter: ``,
       facebook: ``,
@@ -71,7 +71,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: `UA-87089021-3`,
+        trackingId: `UA-87089021-5`,
       },
     },
     {
@@ -114,6 +114,6 @@ module.exports = {
       },
     },
     `gatsby-plugin-typescript`,
-    // `gatsby-plugin-sitemap`,
+    `gatsby-plugin-sitemap`,
   ],
 };
