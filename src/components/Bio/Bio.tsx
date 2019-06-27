@@ -30,7 +30,9 @@ function Bio() {
               }}
             />
             <p style={{ marginTop: -3 }}>
-              Written by <strong>{author}</strong> who lives and works in Suwon, South Korea building useful things.
+              개발자를 꿈꾸는 아들을 둔 아빠 개발자입니다.
+              <br />
+              데이터 시각화에 관심이 있으며, 재미있는 프로그램을 만드는 것을 좋아합니다.
               {` `}
               {social.twitter && <a href={`https://twitter.com/${social.twitter}`}>You should follow him on Twitter</a>}
             </p>
