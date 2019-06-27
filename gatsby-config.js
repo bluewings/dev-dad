@@ -2,6 +2,7 @@ const mdxFeed = require('gatsby-mdx/feed');
 const tailwindcss = require('tailwindcss');
 
 module.exports = {
+  pathPrefix: `/dev-dad`,
   siteMetadata: {
     title: `아빠는 개발자`,
     author: `Cha Sung Won`,
@@ -112,14 +113,7 @@ module.exports = {
         ],
       },
     },
-
-    // {
-    //   resolve: `gatsby-plugin-typescript`,
-    //   options: {
-    //     isTSX: true, // defaults to false
-    //     // jsxPragma: `jsx`, // defaults to "React"
-    //     // allExtensions: true, // defaults to false
-    //   },
-    // },
+    `gatsby-plugin-typescript`,
+    // `gatsby-plugin-sitemap`,
   ],
 };
