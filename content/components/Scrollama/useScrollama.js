@@ -103,34 +103,15 @@ function useScrollama(props) {
   const stages = useRef([]);
   const stageMap = useRef({});
 
-  // const getPayload = useMemo(() => {
-  //   return (payload) => {
-  //     // console.log(steps.current);
-  //     // console.log(payload);
-  //     const { index } = payload;
-  //     if (stageMap.current[index] === undefined) {
-  //       stageMap.current[index] = stages.current.slice(0, index + 1)
-  //       .filter(e => e).pop() || null;
-  //     }
-  //     const stage = stageMap.current[index];
-
-  //       // console.log(index, indexToStage.current[index]);
-  //     return { ...payload, stage };
-
-  //   }
-  // }, [])
-
   useEffect(() => {
     if (step && document.body.querySelectorAll(step).length > 0) {
       stages.current = Array.from(document.body.querySelectorAll(step)).map((e) => {
         return e.getAttribute('data-stage');
       });
-      // console.
       stageMap.current = {};
 
       const stages2 = Array.from(document.body.querySelectorAll(step)).map((e) => e.getAttribute('data-stage'));
 
-      // console.log(stages2);
       const indexToStage = (() => {
         const cache = {};
         return (index) => {
@@ -153,21 +134,6 @@ function useScrollama(props) {
         return index < stageIndex ? 0 : 1;
       };
 
-      // const indexToStageProgress = (() => {
-      //   const cache = {};
-      //   return (index) => {
-      //     if (cache[index] === undefined) {
-      //       cache[index] =
-      //         stages2
-      //           .slice(0, index + 1)
-      //           .filter((e) => e)
-      //           .pop() || null;
-      //     }
-      //     return cache[index];
-      //   };
-      // })();
-
-      // console.log(stages.current);
       const scroller = scrollama();
       scroller
         .setup({ step, offset, progress })
