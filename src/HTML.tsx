@@ -9,6 +9,7 @@ export default function HTML(props: any) {
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="google-site-verification" content="WKeRA4iXnzHldDXCUeQo6mMSkmiHOscmnP2kwWCYSs0" />
+        <meta name="naver-site-verification" content="34cb4860f51ff371b1185d8b3e2cba23eea42248" />
         {props.headComponents}
       </head>
       <body {...props.bodyAttributes}>
