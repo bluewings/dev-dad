@@ -2,12 +2,11 @@ const mdxFeed = require('gatsby-mdx/feed');
 const tailwindcss = require('tailwindcss');
 
 module.exports = {
-  pathPrefix: `/dev-dad`,
   siteMetadata: {
     title: `아빠는 개발자`,
     author: `Cha Sung Won`,
     description: ``,
-    siteUrl: `https://bluewings.github.io/dev-dad/`,
+    siteUrl: `https://bluewings.github.io/`,
     social: {
       twitter: ``,
       facebook: ``,
