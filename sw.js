@@ -26,37 +26,33 @@ workbox.clientsClaim();
  */
 self.__precacheManifest = [
   {
-    "url": "webpack-runtime-86a4f73d06c27408ea9e.js"
+    "url": "webpack-runtime-cfd94e7917c5ec4edd9f.js"
   },
   {
-    "url": "styles.2a557543de7fb4bed5e0.css"
+    "url": "styles.d415e55d4e33b1213f67.css"
   },
   {
-    "url": "styles-ade18e8c8f7d7c729b33.js"
+    "url": "styles-d920fbb45ab1a1d2526e.js"
   },
   {
-    "url": "app-175b642f1f97853af6ca.js"
+    "url": "app-1b58987f5c7e773b72a3.js"
   },
   {
-    "url": "component---node-modules-gatsby-plugin-offline-app-shell-js-316f626f6300f1c6f4f5.js"
+    "url": "component---node-modules-gatsby-plugin-offline-app-shell-js-c52eb332e17328709637.js"
   },
   {
     "url": "offline-plugin-app-shell-fallback/index.html",
-    "revision": "7b314f1d84fa3a33c4c3590615888789"
+    "revision": "b0b576bd23fdaa7f739aaf17910a1ab0"
   },
   {
-    "url": "component---src-pages-404-tsx-769641f596cc42b5df31.js"
+    "url": "component---src-pages-404-tsx-7f508888deebaa1bf68d.js"
   },
   {
-    "url": "1-ff3f76b232edce79b2d4.js"
+    "url": "1-e891b829048ade2bf4d3.js"
   },
   {
     "url": "page-data/404.html/page-data.json",
-    "revision": "2f41d7a2411962a8b37765f095445ab6"
-  },
-  {
-    "url": "page-data/offline-plugin-app-shell-fallback/page-data.json",
-    "revision": "4d0a2e058968dd67d0a4289e9eef0f83"
+    "revision": "49690ca0365e1edfe15ba61b81035033"
   },
   {
     "url": "manifest.webmanifest",
@@ -82,7 +78,7 @@ const navigationRoute = new workbox.routing.NavigationRoute(({ event }) => {
   return idbKeyval.get(WHITELIST_KEY).then((customWhitelist = []) => {
     // Respond with the offline shell if we match the custom whitelist
     if (customWhitelist.includes(pathname)) {
-      const offlineShell = `/dev-dad/offline-plugin-app-shell-fallback/index.html`
+      const offlineShell = `/offline-plugin-app-shell-fallback/index.html`
       const cacheName = workbox.core.cacheNames.precache
 
       return caches.match(offlineShell, { cacheName }).then(cachedResponse => {
@@ -154,7 +150,7 @@ const messageApi = {
 
     pathnames = pathnames.map(({ pathname, includesPrefix }) => {
       if (!includesPrefix) {
-        return `/dev-dad${pathname}`
+        return `${pathname}`
       } else {
         return pathname
       }
