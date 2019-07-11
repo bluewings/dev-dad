@@ -141,6 +141,28 @@ function transform([x, y, { innerHeight, scale, offset }]) {
 <div style={{ height: '2.5rem' }} />
 
 <WarpText
+  message='Brrrr...'
+  fontFamily='Montserrat'
+  transform={transform2}
+  animate
+  interpolate={20}
+  paddingTop={2}
+  paddingBottom={2}
+/>
+
+```js
+function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.02);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 2000) / scale(0.05)),
+    y + wave * Math.sin((x + scale(offset) / 2000) / scale(0.05)),
+  ];
+}
+```
+
+<div style={{ height: '2.5rem' }} />
+
+<WarpText
   message='feel dizzy...'
   fontFamily='Cute Font'
   transform={transform3}
@@ -158,3 +180,43 @@ function transform([x, y, { scale, offset }]) {
   ];
 }
 ```
+
+<div style={{ height: '2.5rem' }} />
+
+<div style={{ position: 'relative', maxWidth: 600 }}>
+  <WarpText
+    message="SUWON"
+    fontFamily='Montserrat'
+    transform={transformA1}
+    color="silver"
+    paddingRight={200}
+    paddingBottom={150}
+  />
+  <div style={{ position: 'absolute', top: 0, width: '100%' }}>
+    <WarpText message="SUWON"
+      fontFamily='Montserrat'
+      transform={transformA2}
+      paddingRight={200}
+      paddingBottom={200}
+    />
+  </div>
+</div>
+
+```js
+function transformA1([x, y, { innerHeight }]) {
+  return [
+    x + innerHeight - y,
+    innerHeight * 0.5 + y * 0.5 + x / 3,
+  ];
+}
+function transformA2([x, y]) {
+  return [
+    x,
+    y + x / 3,
+  ];
+}
+
+```
+
+<div style={{ height: '2.5rem' }} />
+
