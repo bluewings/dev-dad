@@ -74,18 +74,30 @@ exports.createPages = ({ graphql, actions }) => {
       });
     });
 
-    const otherLangPosts = posts.filter(({ node }) => node.fields.langKey !== langKeyDefault);
-    otherLangPosts.forEach((post) => {
-      const { slug, directoryName, fileExt } = post.node.fields;
-      const translations = translationsByDirectory[directoryName] || [];
-      createPage({
-        path: slug,
-        component: blogPost,
-        context: {
-          slug,
-          translations,
-          fileExt,
-        },
+    Object.entries(
+      posts
+        .filter(({ node }) => node.fields.langKey !== langKeyDefault)
+        .reduce((accum, post) => {
+          const { langKey } = post.node.fields;
+          return { [langKey]: [...(accum[langKey] || []), post] };
+        }, {}),
+    ).forEach(([, langPosts]) => {
+      langPosts.forEach((post, index) => {
+        const previous = index === langPosts.length - 1 ? null : langPosts[index + 1].node;
+        const next = index === 0 ? null : langPosts[index - 1].node;
+        const { slug, directoryName, fileExt } = post.node.fields;
+        const translations = translationsByDirectory[directoryName] || [];
+        createPage({
+          path: slug,
+          component: blogPost,
+          context: {
+            slug,
+            previous,
+            next,
+            translations,
+            fileExt,
+          },
+        });
       });
     });
   });
