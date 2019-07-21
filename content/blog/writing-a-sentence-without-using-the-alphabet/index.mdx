@@ -1,0 +1,57 @@
+---
+title: 알파벳을 사용하지 않고 문장 쓰기
+date: "2019-07-20T23:33:07.518Z"
+---
+
+import Generator from './Generator';
+import Context from '../../components/Context';
+import { Code } from '../../../src/components/Code';
+
+```javascript
+(+!![] / +![] + [])[!+[] + !+[] + !+[]] + 
+  (+!![] / +![] + [])[+!+[]] + 
+  (![] + {})[+!+[] + [+[]]] + 
+  (!![] + [])[+!+[]] + 
+  (!![] + [])[!+[] + !+[] + !+[]] + 
+  ([][[]] + [])[!+[] + !+[]] + 
+  (+!![] / +![] + [])[!+[] + !+[] + !+[]] + 
+  ([] + {})[!+[] + !+[]] + 
+  (![] + [])[!+[] + !+[]] + 
+  (!![] + [])[!+[] + !+[] + !+[]]
+// -> 'incredible'
+```
+
+믿기 어렵겠지만, 위의 코드를 브라우저 개발자 콘솔에서 실행해보면 `incredible` 이 표시되는데, 이는 버그가 아니라 자바스크립트의 이상한(?) 특성들을 교묘하게 사용한 정상적인 코드이다.
+
+저 수상한 코드는 자바스크립트의 형 변환, 덧셈 등을 이용하여 숨겨진 메시지를 표시한다.
+
+---
+
+## 수상한 자바스크립트 코드 생성기
+
+아래 입력창에 메시지를 입력하면 특수문자만으로 작성된 수상한 자바스크립트 코드가 생성됩니다. 생성된 코드를 브라우저의 개발자 도구 또는 node.js REPL 환경에서 실행해보면 원본 메시지를 확인할 수 있습니다.
+
+[](@context)
+
+<Context>
+  {({ setValue }) => {
+    const handleChange = ({ text, code, newLine }) => {
+      setValue('code', code);
+      setValue('newLine', newLine);
+    };
+    return <Generator onChange={handleChange} placeholder='변환할 텍스트를 입력하세요.' />;
+  }}
+</Context>
+
+<Context>{({ value }) => (
+  <Code codeString={value.code || ''} language="javascript" lineWrap={!value.newLine} clipboard={true} />
+)}</Context>
+
+[](@contextend)
+
+숫자 · 영문자 이외의 문자, 그리고 다음 알파벳은 변환되지 않습니다.<br />
+`g` `h` `k` `m` `p` `q` `v` `w` `x` `z`
+
+---
+
+이 포스트는 [What the f*ck JavaScript?](https://github.com/denysdovhan/wtfjs#its-a-fail) 에서 아이디어를 얻었습니다.
