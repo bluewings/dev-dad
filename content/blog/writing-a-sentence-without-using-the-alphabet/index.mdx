@@ -3,7 +3,7 @@ title: 알파벳을 사용하지 않고 문장 쓰기
 date: "2019-07-20T23:33:07.518Z"
 ---
 
-import Generator from './Generator';
+import Generator, { Skipped } from './Generator';
 import Context from '../../components/Context';
 import { Code } from '../../../src/components/Code';
 
@@ -35,8 +35,9 @@ import { Code } from '../../../src/components/Code';
 
 <Context>
   {({ setValue }) => {
-    const handleChange = ({ text, code, newLine }) => {
+    const handleChange = ({ text, code, skipped, newLine }) => {
       setValue('code', code);
+      setValue('skipped', skipped);
       setValue('newLine', newLine);
     };
     return <Generator onChange={handleChange} placeholder='변환할 텍스트를 입력하세요.' />;
@@ -44,14 +45,17 @@ import { Code } from '../../../src/components/Code';
 </Context>
 
 <Context>{({ value }) => (
-  <Code codeString={value.code || ''} language="javascript" lineWrap={!value.newLine} clipboard={true} />
+  <span>
+    <Code codeString={value.code || ''} language="javascript" lineWrap={!value.newLine} clipboard={true} />
+    <p>
+      숫자 · 영문자 이외의 문자, 그리고 다음 알파벳은 변환되지 않습니다.<br />
+      <Skipped skipped={value.skipped} />
+    </p>
+  </span>
 )}</Context>
 
 [](@contextend)
 
-숫자 · 영문자 이외의 문자, 그리고 다음 알파벳은 변환되지 않습니다.<br />
-`g` `h` `k` `m` `p` `q` `v` `w` `x` `z`
-
 ---
 
-이 포스트는 [What the f*ck JavaScript?](https://github.com/denysdovhan/wtfjs#its-a-fail) 에서 아이디어를 얻었습니다.
+이 포스트는 [What the f*ck JavaScript?](https://github.com/denysdovhan/wtfjs#its-a-fail) 에서 영감을 얻었습니다.

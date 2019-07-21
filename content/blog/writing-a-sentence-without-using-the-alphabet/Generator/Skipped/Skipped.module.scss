@@ -1,0 +1,15 @@
+.root {
+  .skipped {
+    background: #fed7d7;
+  }
+}
+
+body {
+  &:global(.dark) {
+    .root {
+      .skipped {
+        background: #742a2a;
+      }
+    }
+  }
+}

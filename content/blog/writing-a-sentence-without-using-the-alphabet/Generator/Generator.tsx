@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState, SyntheticEvent } from 'react';
-import { textToSymbol } from './util';
+import { textToCode } from './util';
 import styles from './Generator.module.scss';
 
 function Generator(props: any) {
@@ -26,9 +26,9 @@ function Generator(props: any) {
     setRemoveSpace(!removeSpace);
   }, [removeSpace]);
 
-  const code = useMemo(
+  const { code, skipped } = useMemo(
     () =>
-      textToSymbol(text, {
+      textToCode(text, {
         newLine,
         summary,
         removeSpace,
@@ -38,9 +38,9 @@ function Generator(props: any) {
 
   useEffect(() => {
     if (typeof props.onChange === 'function') {
-      props.onChange({ text, code, newLine });
+      props.onChange({ text, code, skipped, newLine });
     }
-  }, [text, code, newLine]);
+  }, [text, code, skipped, newLine]);
 
   return (
     <div className={styles.root}>

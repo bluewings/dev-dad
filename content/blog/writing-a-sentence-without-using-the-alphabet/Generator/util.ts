@@ -105,7 +105,7 @@ const charToSymbol = (() => {
   };
 })();
 
-const textToSymbol = (input = 'dad and son', options?: any) => {
+const textToCode = (input = 'dad and son', options?: any) => {
   const { newLine = true, summary = true, removeSpace = true } = options || {};
 
   let lines: any = input
@@ -129,6 +129,10 @@ const textToSymbol = (input = 'dad and son', options?: any) => {
       };
     });
 
+  const skipped: string[] = lines
+    .filter(({ char, text }: any) => `'${char}'` === text.replace(/\s*\+\s*$/, ''))
+    .map(({ char }: any) => char);
+
   const maxLen = Math.max(
     ...lines.map(({ text }: any, i: number) => {
       return text.length + (!removeSpace && i > 0 ? 2 : 0);
@@ -146,12 +150,14 @@ const textToSymbol = (input = 'dad and son', options?: any) => {
     return text;
   });
 
-  return (
-    lines
-      .map((text: any) => text)
-      .join('')
-      .trim() + `\n// -> '${input}'`
-  );
+  return {
+    code:
+      lines
+        .map((text: any) => text)
+        .join('')
+        .trim() + `\n// -> '${input}'`,
+    skipped,
+  };
 };
 
-export { textToSymbol };
+export { textToCode };
