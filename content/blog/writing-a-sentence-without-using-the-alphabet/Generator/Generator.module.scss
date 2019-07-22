@@ -5,11 +5,24 @@
     background: transparent;
     border: 1px solid var(--hr);
     color: var(--text-normal);
-    @apply p-4 w-full;
-    margin-bottom: 0.5rem;
+    @apply px-4 py-2 w-full;
+    margin-bottom: 0;
   }
   label {
     margin: 0 0.5rem;
   }
   margin-bottom: 1.75rem;
+}
+.input {
+  margin-bottom: 1.75rem;
+}
+.samples {
+  border: 1px solid var(--hr);
+  border-top: none;
+  margin-bottom: 0.5rem;
+  background: var(--translation-bg);
+  code {
+    white-space: nowrap;
+  }
+  @apply px-4 py-2 w-full;
 }
