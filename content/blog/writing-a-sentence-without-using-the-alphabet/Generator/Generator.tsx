@@ -59,7 +59,7 @@ function Generator({ onChange, placeholder, lang }: any) {
         </label>
         <label>
           <input type="checkbox" disabled={!newLine} defaultChecked={summary} onClick={handleSummaryToggle} />
-          &nbsp;{lang === 'en' ? 'description' : '설명 표시'}
+          &nbsp;{lang === 'en' ? 'explanation' : '설명 표시'}
         </label>
         <label>
           <input type="checkbox" disabled={!newLine} defaultChecked={removeSpace} onClick={handleRemoveSpace} />
