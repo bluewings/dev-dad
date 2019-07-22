@@ -100,7 +100,7 @@ function Generator({ onChange, placeholder, lang }: any) {
                     </a>
                   )}
                 </code>
-                {i < arr.length - 1 && ' , '}
+                {i < arr.length - 1 && ' · '}
               </>
             );
           })}
