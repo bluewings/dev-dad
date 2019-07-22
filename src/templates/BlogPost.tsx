@@ -107,7 +107,7 @@ function BlogPostTemplate(props: any) {
           marginBottom: rhythm(1),
         }}
       />
-      <Bio />
+      <Bio lang={langKeyDefault !== lang ? lang : ''} />
 
       <ul
         style={{

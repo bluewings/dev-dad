@@ -3,7 +3,7 @@ import { StaticQuery, graphql } from 'gatsby';
 import Image from 'gatsby-image';
 import { rhythm } from '../../utils/typography';
 
-function Bio() {
+function Bio({ lang }: any) {
   return (
     <StaticQuery
       query={bioQuery}
@@ -30,9 +30,19 @@ function Bio() {
               }}
             />
             <p style={{ marginTop: -3 }}>
-              개발자를 꿈꾸는 아들을 둔 아빠 개발자입니다.
-              <br />
-              데이터 시각화에 관심이 있으며, 재미있는 프로그램을 만드는 것을 좋아합니다.
+              {lang === 'en' ? (
+                <>
+                  I am a developer dad with a son who dreams of a developer.
+                  <br />
+                  I'm interested in data visualization and enjoy creating fun programs.
+                </>
+              ) : (
+                <>
+                  개발자를 꿈꾸는 아들을 둔 아빠 개발자입니다.
+                  <br />
+                  데이터 시각화에 관심이 있으며, 재미있는 프로그램을 만드는 것을 좋아합니다.
+                </>
+              )}
               {` `}
               {social.twitter && <a href={`https://twitter.com/${social.twitter}`}>You should follow him on Twitter</a>}
             </p>

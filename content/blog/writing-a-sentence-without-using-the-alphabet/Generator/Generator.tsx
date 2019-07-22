@@ -9,7 +9,7 @@ const pickOne = (items: any) => items[~~(Math.random() * items.length)];
 
 const samples = [
   'toy story 3',
-  'to inifinity and beyond',
+  'to infinity and beyond',
   'success',
   'fail',
   'bts',
