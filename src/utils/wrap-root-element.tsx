@@ -7,6 +7,68 @@ import { Provider as ThemeProvider } from './theme-context';
 import { Provider as DataProvider } from './context';
 import styles from './wrap.module.scss';
 
+const getHeading = (tag: string) => {
+  let Heading: any;
+  switch (tag) {
+    case 'h1':
+      Heading = (props: any) => <h1 {...props} />;
+      break;
+    case 'h2':
+      Heading = (props: any) => <h2 {...props} />;
+      break;
+    case 'h3':
+      Heading = (props: any) => <h3 {...props} />;
+      break;
+    case 'h4':
+      Heading = (props: any) => <h4 {...props} />;
+      break;
+    case 'h5':
+      Heading = (props: any) => <h5 {...props} />;
+      break;
+    default:
+      Heading = (props: any) => <h6 {...props} />;
+      break;
+  }
+
+  return (headingProps: any) => {
+    const { children } = headingProps;
+
+    if (typeof children !== 'string') {
+      return <Heading {...headingProps} />;
+    }
+
+    const anchor = children
+      .toLowerCase()
+      .replace(/[^a-zA-Z가-힣0-9]/g, ' ')
+      .trim()
+      .replace(/\s+/g, '-');
+
+    return (
+      <div>
+        <Heading>
+          <a id={`user-content-${anchor}`} className={styles.anchor} aria-hidden="true" href={`#${anchor}`}>
+            <div id={`${anchor}`} />
+            <svg
+              className="octicon octicon-link"
+              viewBox="0 0 16 16"
+              version="1.1"
+              width="16"
+              height="16"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"
+              />
+            </svg>
+          </a>
+          {headingProps.children}
+        </Heading>
+      </div>
+    );
+  };
+};
+
 const preToCodeBlock = (preProps: any) => {
   if (
     // children is MDXTag
@@ -109,6 +171,12 @@ const getChildProps = (tag: string, props: any = {}) => {
 // components is its own object outside of render so that the references to
 // components are stable
 const components = {
+  h1: getHeading('h1'),
+  h2: getHeading('h2'),
+  h3: getHeading('h3'),
+  h4: getHeading('h4'),
+  h5: getHeading('h5'),
+  h6: getHeading('h6'),
   pre: (preProps: any) => {
     const props = preToCodeBlock(preProps);
     // if there's a codeString and some props, we passed the test

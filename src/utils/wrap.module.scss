@@ -37,3 +37,25 @@ $gutter: 42px;
     }
   }
 }
+
+.anchor {
+  float: left;
+  line-height: 1;
+  margin-left: -20px;
+  padding-right: 4px;
+  box-shadow: none;
+  opacity: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  &:hover {
+    .anchor {
+      opacity: 1;
+    }
+  }
+}
