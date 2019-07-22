@@ -1,0 +1,63 @@
+---
+title: Writing a sentence without using the Alphabet
+date: "2019-07-20T23:33:07.518Z"
+---
+
+import Generator, { Skipped } from './Generator';
+import Context from '../../components/Context';
+import { Code } from '../../../src/components/Code';
+
+```javascript
+(+!![] / +![] + [])[!+[] + !+[] + !+[]] + 
+  (+!![] / +![] + [])[+!+[]] + 
+  (![] + {})[+!+[] + [+[]]] + 
+  (!![] + [])[+!+[]] + 
+  (!![] + [])[!+[] + !+[] + !+[]] + 
+  ([][[]] + [])[!+[] + !+[]] + 
+  (+!![] / +![] + [])[!+[] + !+[] + !+[]] + 
+  ([] + {})[!+[] + !+[]] + 
+  (![] + [])[!+[] + !+[]] + 
+  (!![] + [])[!+[] + !+[] + !+[]]
+// -> 'incredible'
+```
+
+It's hard to believe, but when you run the above code on the browser's developer console, you'll see `incredible`. This is not a bug, and it's normal code that uses tricky JavaScript features.
+
+That weird code displays the message using JavaScript's type conversion in addition.
+
+---
+
+## Weird JavaScript generator
+
+Enter the message to be converted in the input form below. Then copy the generated weird code to the clipboard and run it in the browser's developer console or node.js REPL environment to view the original message.
+
+[](@context)
+
+<Context>
+  {({ setValue }) => {
+    const handleChange = ({ text, code, skipped, newLine }) => {
+      setValue('code', code);
+      setValue('skipped', skipped);
+      setValue('newLine', newLine);
+    };
+    return <Generator onChange={handleChange} placeholder='Please enter text to convert.' lang='en' />;
+  }}
+</Context>
+
+<Context>{({ value }) => (
+  <span>
+    <Code codeString={value.code || ''} language="javascript" lineWrap={!value.newLine} clipboard={true} />
+    <p>
+      Only numbers and alphabets are converted, but the following alphabets are not converted.<br />
+      <Skipped skipped={value.skipped} />      
+    </p>
+  </span>
+)}</Context>
+
+If you know how to convert the those alphabets, please let me know. thank you.
+
+[](@contextend)
+
+---
+
+This post was deeply inspired by [What the f*ck JavaScript?](https://github.com/denysdovhan/wtfjs#its-a-fail).

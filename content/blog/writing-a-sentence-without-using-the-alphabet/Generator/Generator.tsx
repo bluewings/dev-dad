@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState, SyntheticEvent } from 'react
 import { textToCode } from './util';
 import styles from './Generator.module.scss';
 
-function Generator(props: any) {
+function Generator({ onChange, placeholder, lang }: any) {
   const [text, setText] = useState('toy story 3');
   const handleTextChange = (event: SyntheticEvent) => {
     // @ts-ignore
@@ -37,8 +37,8 @@ function Generator(props: any) {
   );
 
   useEffect(() => {
-    if (typeof props.onChange === 'function') {
-      props.onChange({ text, code, skipped, newLine });
+    if (typeof onChange === 'function') {
+      onChange({ text, code, skipped, newLine });
     }
   }, [text, code, skipped, newLine]);
 
@@ -48,22 +48,22 @@ function Generator(props: any) {
         <input
           type="text"
           defaultValue={text}
-          placeholder={props.placeholder || ''}
+          placeholder={placeholder || ''}
           onChange={handleTextChange}
           autoComplete="off"
           spellCheck={false}
         />
         <label>
           <input type="checkbox" defaultChecked={newLine} onClick={handleNewLineToggle} />
-          &nbsp;줄바꿈
+          &nbsp;{lang === 'en' ? 'new line' : '줄바꿈'}
         </label>
         <label>
           <input type="checkbox" disabled={!newLine} defaultChecked={summary} onClick={handleSummaryToggle} />
-          &nbsp;설명 표시
+          &nbsp;{lang === 'en' ? 'description' : '설명 표시'}
         </label>
         <label>
           <input type="checkbox" disabled={!newLine} defaultChecked={removeSpace} onClick={handleRemoveSpace} />
-          &nbsp;공백 제거
+          &nbsp;{lang === 'en' ? 'remove space' : '설명 표시'}
         </label>
       </div>
     </div>
