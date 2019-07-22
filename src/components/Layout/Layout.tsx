@@ -8,7 +8,7 @@ import '../../styles/common.css';
 import '../../styles/tooltip.scss';
 
 function Layout(props: any) {
-  const { location, title, children, maxWidth, isIndexPage } = props;
+  const { location, lang, title, children, maxWidth, isIndexPage } = props;
   // @ts-ignore
   const rootPath = `${__PATH_PREFIX__}/`;
   let header;
@@ -47,7 +47,7 @@ function Layout(props: any) {
             textDecoration: `none`,
             color: `inherit`,
           }}
-          to="/"
+          to={`/${lang ? lang + '/' : ''}`}
         >
           {title}
         </Link>

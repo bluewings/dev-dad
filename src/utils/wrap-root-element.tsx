@@ -7,6 +7,28 @@ import { Provider as ThemeProvider } from './theme-context';
 import { Provider as DataProvider } from './context';
 import styles from './wrap.module.scss';
 
+const hashCode = (str: any) => {
+  let hash: any = 0;
+  if (typeof str === 'object' && str !== null) {
+    str = JSON.stringify(str);
+  }
+  if (!str || str.length === 0) {
+    return hash;
+  }
+  let i = 0;
+  const len = str.length;
+  while (i < len) {
+    const chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0;
+    i++;
+  }
+  const base16 = hash.toString(16).replace(/[^a-z0-9]/g, '');
+  const base36 = hash.toString(36).replace(/[^a-z0-9]/g, '');
+  hash = (parseInt(base16.substr(0, 1), 16) + 10).toString(36) + base36;
+  return hash;
+};
+
 const getHeading = (tag: string) => {
   let Heading: any;
   switch (tag) {
@@ -37,11 +59,15 @@ const getHeading = (tag: string) => {
       return <Heading {...headingProps} />;
     }
 
-    const anchor = children
+    let anchor = children
       .toLowerCase()
-      .replace(/[^a-zA-Z가-힣0-9]/g, ' ')
+      .replace(/[^a-zA-Z0-9]/g, ' ')
       .trim()
       .replace(/\s+/g, '-');
+
+    if (anchor.length <= 4) {
+      anchor = `section-${hashCode(children)}`;
+    }
 
     return (
       <div>

@@ -53,6 +53,7 @@ function BlogPostTemplate(props: any) {
       site: {
         siteMetadata: {
           title: siteTitle,
+          titleEn: siteTitleEn,
           social: { disqusShortname },
           github: { owner, repository },
         },
@@ -70,9 +71,13 @@ function BlogPostTemplate(props: any) {
   )}/index${lang === langKeyDefault ? '' : `.${lang}`}.${fileExt}`;
   const translations = translations_.slice();
   translations.sort((a: any, b: any) => (codeToLanguage(a) < codeToLanguage(b) ? -1 : 1));
-
   return (
-    <Layout location={location} title={siteTitle} maxWidth={post.frontmatter.max_width}>
+    <Layout
+      location={location}
+      lang={langKeyDefault !== lang ? lang : ''}
+      title={lang === 'en' ? siteTitleEn : siteTitle}
+      maxWidth={post.frontmatter.max_width}
+    >
       <SEO title={post.frontmatter.title} description={post.excerpt} />
       <h1>{post.frontmatter.title}</h1>
       <p
@@ -148,6 +153,7 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         title
+        titleEn
         author
         social {
           disqusShortname

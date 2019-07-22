@@ -4,6 +4,7 @@ const tailwindcss = require('tailwindcss');
 module.exports = {
   siteMetadata: {
     title: `아빠는 개발자`,
+    titleEn: `Dev Dad`,
     author: `Cha Sung Won`,
     description: ``,
     siteUrl: `https://bluewings.github.io/`,

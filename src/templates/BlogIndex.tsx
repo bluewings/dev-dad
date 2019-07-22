@@ -7,11 +7,12 @@ import { rhythm } from '../utils/typography';
 
 function BlogIndex(props: any) {
   const { data, location } = props;
-  const siteTitle = data.site.siteMetadata.title;
+  const lang = location.pathname.replace(/[^a-z]/g, '');
+  const siteTitle = lang === 'en' ? data.site.siteMetadata.titleEn : data.site.siteMetadata.title;
   const posts = data.allMdx.edges;
 
   return (
-    <Layout location={location} title={siteTitle} isIndexPage>
+    <Layout location={location} lang={lang} title={siteTitle} isIndexPage>
       <SEO title="All posts" keywords={[`blog`, `gatsby`, `javascript`, `react`]} />
       <Bio />
       {posts.map(({ node }: any) => {
@@ -43,6 +44,7 @@ export const pageQuery = graphql`
     site {
       siteMetadata {
         title
+        titleEn
       }
     }
     allMdx(filter: { fields: { langKey: { eq: $langKey } } }, sort: { fields: [frontmatter___date], order: DESC }) {
