@@ -115,7 +115,7 @@ function Generator({ onChange, placeholder, lang }: any) {
         </label>
         <label>
           <input type="checkbox" disabled={!newLine} defaultChecked={removeSpace} onClick={handleRemoveSpace} />
-          &nbsp;{lang === 'en' ? 'remove space' : '설명 표시'}
+          &nbsp;{lang === 'en' ? 'remove space' : '공백 제거'}
         </label>
       </div>
       <Code codeString={code || ''} language="javascript" lineWrap={!newLine} clipboard={true} />
