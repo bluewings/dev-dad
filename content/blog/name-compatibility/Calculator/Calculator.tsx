@@ -47,7 +47,7 @@ const compareScore = (a: any, b: any) => {
 
 const inputToURI = (userInput: string) => {
   try {
-    return `${location.origin}${location.pathname}?user-input=${encodeURIComponent(userInput)}`;
+    return `${location.origin}${location.pathname}?user-input=${encodeURIComponent(userInput)}#result`;
   } catch (err) {
     /* ignore */
   }
@@ -245,7 +245,7 @@ function Calculator({ onCasesChange }: any) {
           </>
         )}
       </div>
-      <div className={styles.showcase}>
+      <div className={styles.showcase} id="user-content-result">
         {cases.length > 1 && (
           <div className={styles.rank}>
             <div className={styles.search}>
