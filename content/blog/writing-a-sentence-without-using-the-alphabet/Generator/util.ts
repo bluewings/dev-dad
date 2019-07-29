@@ -1,118 +1,100 @@
-const range = (from: number, to: number) =>
-  Array(to - from + 1)
-    .fill(true)
-    .map((e, i) => from + i);
+import getSymbols from './symbols';
 
-const charToSymbol = (() => {
-  const symbols = [
-    '!![]', // true
-    '![]', // false
-    '[][[]]', // undefined
-    '+!![] / +![]', // Infinity
-    '{}', // [object Object]
-    '+{}', // NaN
-  ];
-
-  const numbers: any = (() => {
-    const zero = '+[]';
-    const one = '+!+[]';
-    const two = '!+[] + !+[]';
-    const three = '!+[] + !+[] + !+[]';
-    const ten = `${one} + [${zero}]`;
-    return range(11, 30).reduce((accum, i) => [...accum, `${accum[~~(i / 10)]} + [${accum[i % 10]}]`], [
-      zero, // 0
-      one, // 1
-      two, // 2
-      three, // 3
-      `(${two}) * (${two})`, // 4
-      `(${ten}) / (${two})`, // 5
-      `(${two}) * (${three})`, // 6
-      `(${ten}) - (${three})`, // 7
-      `(${two}) ** (${three})`, // 8
-      `(${ten}) - ${one}`, // 9
-      ten, // 10
-    ]);
-  })();
-
+const getDict = (() => {
   const compare = (a: any, b: any) => a.expression.length - b.expression.length;
+  const cached: any = {};
+  return (operators = true) => {
+    const _operators = operators.toString();
 
-  let dict = symbols
-    .map((symbol) => ({
-      symbol,
-      string: `${(symbol === '{}' ? {} : eval(symbol)) + ''}`,
-    }))
-    // add symbol + symbol patterns.
-    .reduce(
-      (accum: any, { symbol, string }: any, i: number, symbols: any) => [
-        ...accum,
-        ...symbols.map((e: any, j: number) =>
-          i === j ? { string: [string], symbol: [symbol] } : { string: [string, e.string], symbol: [symbol, e.symbol] },
-        ),
-      ],
-      [],
-    )
-    // to char dictionary
-    .reduce((accum: any, e: any) => {
-      let { symbol, string } = e;
-      [...string.join('')].forEach((char, position) => {
-        if (!accum[char]) {
-          accum[char] = {};
-        }
-        if (symbol[0] === '{}') {
-          symbol[0] = '[] + {}';
-        }
-        let _symbol = symbol.join(' + ');
-        const _string = string.join('');
-        if (eval(_symbol) !== _string) {
-          const [first, ...rest] = symbol;
-          _symbol = [`${first} + []`, ...rest].join(' + ');
-        }
+    if (!cached[_operators]) {
+      const { symbols, numberToSymbol } = getSymbols(operators);
+      let dict = symbols
+        .map((symbol) => ({
+          symbol,
+          string: `${(symbol === '{}' ? {} : eval(symbol)) + ''}`,
+        }))
+        // add symbol + symbol patterns.
+        .reduce(
+          (accum: any, { symbol, string }: any, i: number, symbols: any) => [
+            ...accum,
+            ...symbols.map((e: any, j: number) =>
+              i === j
+                ? { string: [string], symbol: [symbol] }
+                : { string: [string, e.string], symbol: [symbol, e.symbol] },
+            ),
+          ],
+          [],
+        )
+        // to char dictionary
+        .reduce((accum: any, e: any) => {
+          let { symbol, string } = e;
+          [...string.join('')].forEach((char, position) => {
+            if (!accum[char]) {
+              accum[char] = {};
+            }
+            if (symbol[0] === '{}') {
+              symbol[0] = '[] + {}';
+            }
+            let _symbol = symbol.join(' + ');
+            const _string = string.join('');
+            if (eval(_symbol) !== _string) {
+              const [first, ...rest] = symbol;
+              _symbol = [`${first} + []`, ...rest].join(' + ');
+            }
 
-        if (!accum[char][position] || _string.length < accum[char][position]._string.length) {
-          accum[char][position] = {
-            _string,
-            _symbol,
-            string,
-            symbol,
-            expression: `(${_symbol})[${numbers[position]}]`,
-            summary: `${string
-              .map((f: any) => `'${f}'`)
-              .join(' + ')
-              .replace(/^(.* \+ .*)$/, '($1)')}[${position}]`,
-          };
-        }
-      });
-      return accum;
-    }, {});
+            if (!accum[char][position] || _string.length < accum[char][position]._string.length) {
+              accum[char][position] = {
+                _string,
+                _symbol,
+                string,
+                symbol,
+                expression: `(${_symbol})[${numberToSymbol(position)}]`,
+                summary: `${string
+                  .map((f: any) => `'${f}'`)
+                  .join(' + ')
+                  .replace(/^(.* \+ .*)$/, '($1)')}[${position}]`,
+              };
+            }
+          });
+          return accum;
+        }, {});
 
-  // find shortest, longest
-  dict = Object.entries(dict).reduce((accum: any, [char, info]: any) => {
-    const sorted = Object.values(info).sort(compare);
-    const shortest = sorted[0];
-    const longest = sorted.pop();
-    return { ...accum, [char]: { shortest, longest } };
-  }, {});
-
-  return (char: string, shortest: boolean = true) => {
-    let found = dict[char] || dict[char.toLowerCase()];
-    if (found) {
-      return shortest !== false ? found.shortest : found.longest;
+      // find shortest, longest
+      cached[_operators] = [
+        Object.entries(dict).reduce((accum: any, [char, info]: any) => {
+          const sorted = Object.values(info).sort(compare);
+          const shortest = sorted[0];
+          const longest = sorted.pop();
+          return { ...accum, [char]: { shortest, longest } };
+        }, {}),
+        numberToSymbol,
+      ];
     }
-    if (char.search(/^[0-9]$/) !== -1) {
-      return { expression: `(${numbers[char]})` };
-    }
-    return { expression: `'${char}'` };
+
+    return cached[_operators];
   };
 })();
 
+const charToSymbol = (char: string, operators = true, shortest: boolean = true) => {
+  const [dict, numberToSymbol] = getDict(operators);
+  let found = dict[char] || dict[char.toLowerCase()];
+  if (found) {
+    return shortest !== false ? found.shortest : found.longest;
+  }
+  if (char.search(/^[0-9]$/) !== -1) {
+    return { expression: `(${numberToSymbol(char)})` };
+  }
+  return { expression: `'${char}'` };
+};
+
 const textToCode = (input = 'dad and son', options?: any) => {
-  const { newLine = true, summary = true, removeSpace = true } = options || {};
+  const { newLine = true, summary = true, removeSpace = true, operators = true } = options || {};
 
   let lines: any = input
     .trim()
     .split('')
     .map((char, i, arr) => {
-      let { expression, summary } = charToSymbol(char);
+      let { expression, summary } = charToSymbol(char, operators);
       if (char.search(/[0-9]/) !== -1 && i === 0) {
         const evaluated = eval(expression);
         if (typeof evaluated !== 'string') {

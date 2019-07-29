@@ -16,6 +16,10 @@
 .input {
   margin-bottom: 1.75rem;
 }
+.code {
+  background: var(--translation-bg);
+  padding: 0.2em 0.4em;
+}
 .samples {
   border: 1px solid var(--hr);
   border-top: none;

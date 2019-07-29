@@ -70,3 +70,6 @@ yarn-error.log
 
 package-lock.json
 yarn.lock
+
+# ignore draft
+content/blog/_draft*

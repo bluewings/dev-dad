@@ -55,9 +55,14 @@ function Generator({ onChange, placeholder, lang }: any) {
   }, [summary]);
 
   const [removeSpace, setRemoveSpace] = useState(false);
-  const handleRemoveSpace = useCallback(() => {
+  const handleRemoveSpaceToggle = useCallback(() => {
     setRemoveSpace(!removeSpace);
   }, [removeSpace]);
+
+  const [useOperators, setOperators] = useState(true);
+  const handleUseOperatorsToggle = useCallback(() => {
+    setOperators(!useOperators);
+  }, [useOperators]);
 
   const { code, skipped } = useMemo(
     () =>
@@ -65,8 +70,9 @@ function Generator({ onChange, placeholder, lang }: any) {
         newLine,
         summary,
         removeSpace,
+        operators: useOperators,
       }),
-    [text, newLine, summary, removeSpace],
+    [text, newLine, summary, removeSpace, useOperators],
   );
 
   useEffect(() => {
@@ -114,8 +120,13 @@ function Generator({ onChange, placeholder, lang }: any) {
           &nbsp;{lang === 'en' ? 'explanation' : '설명 표시'}
         </label>
         <label>
-          <input type="checkbox" disabled={!newLine} defaultChecked={removeSpace} onClick={handleRemoveSpace} />
+          <input type="checkbox" disabled={!newLine} defaultChecked={removeSpace} onClick={handleRemoveSpaceToggle} />
           &nbsp;{lang === 'en' ? 'remove space' : '공백 제거'}
+        </label>
+        <label>
+          <input type="checkbox" defaultChecked={useOperators} onClick={handleUseOperatorsToggle} />
+          &nbsp;{lang === 'en' ? 'operators' : '연산자 사용'} <code className={styles.code}>-</code>{' '}
+          <code className={styles.code}>*</code> <code className={styles.code}>/</code>
         </label>
       </div>
       <Code codeString={code || ''} language="javascript" lineWrap={!newLine} clipboard={true} />
