@@ -42,13 +42,14 @@ const getDict = (() => {
               _symbol = [`${first} + []`, ...rest].join(' + ');
             }
 
-            if (!accum[char][position] || _string.length < accum[char][position]._string.length) {
+            const expression = `(${_symbol})[${numberToSymbol(position)}]`;
+            if (!accum[char][position] || expression.length < accum[char][position].expression.length) {
               accum[char][position] = {
                 _string,
                 _symbol,
                 string,
                 symbol,
-                expression: `(${_symbol})[${numberToSymbol(position)}]`,
+                expression,
                 summary: `${string
                   .map((f: any) => `'${f}'`)
                   .join(' + ')
