@@ -27,6 +27,10 @@ body {
   blockquote {
     color: inherit;
     border-left-color: inherit;
+    code {
+      font-size: 1em;
+      font-style: normal;
+    }
   }
   :global(.sticky) {
     position: sticky;

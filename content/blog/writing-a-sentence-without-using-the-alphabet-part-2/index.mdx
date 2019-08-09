@@ -1,0 +1,162 @@
+---
+title: 알파벳 없이 문장 쓰기 - 파트 2
+date: "2019-08-04T14:06:57.056Z"
+---
+
+import GeneratorV2 from './GeneratorV2';
+
+이전 글: [알파벳 없이 문장 쓰기](/writing-a-sentence-without-using-the-alphabet/)
+
+---
+
+이전 글에서 일부 문자를 만들 수 없다고 썼었는데, 며칠 지나지 않아 그 [문제의 해결법을 제시한 글](http://patriciopalladino.com/blog/2012/08/09/non-alphanumeric-javascript.html)을 찾았습니다. 그리고 `(` `)` `+` `[` `]` `!` 이 여섯개의 문자만으로 JavaScript 를 표현하는 구현체가 이미 있었습니다. ㅠ_ㅠ [JSF*ck](http://www.jsfuck.com/), [Hieroglyphy](http://patriciopalladino.com/files/hieroglyphy/)
+
+이미 동일한 기능의 라이브러리가 있다는 사실에 조금 실망했지만 호기심을 만족시키기 위해 위의 내용을 참고하여 코드 생성기를 수정했습니다.
+
+아래에 텍스트를 입력하시면 영문, 숫자를 포함한 모든 문자를 제한된 코드로 변환해줍니다
+
+<GeneratorV2 />
+
+<!-- ---
+
+아래는 제가 참고한 [Brainfuck beware: JavaScript is after you!](http://patriciopalladino.com/blog/2012/08/09/non-alphanumeric-javascript.html)에서 제시한 방법입니다.
+
+## 유레카! Eureka. 👏
+
+알파벳 없이 문장 쓰기 을 쓰고 
+
+[unescape() - MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/unescape)
+
+> The `unescape()` function computes a new string in which hexadecimal escape sequences are replaced with the character that it represents.
+
+unescape()
+
+```javascript{1,2}
+unescape('abc123');     // "abc123"
+unescape('%E4%F6%FC');  // "äöü"
+unescape('%u0107');     // "ć"
+```
+
+특히 % + HEXA_ASCII_VALUE 값으로 입력하면 원하는 모든 글자를 얻을 수 있습니다.
+
+
+
+
+1. 우리가 얻을 수 있는 것은 문자열이고 실행가능한 스크립트는 아니다.
+
+2. p 와 % 가 필요하다.
+
+## 1. 실행가능한 스크립트를 만들자
+
+
+
+
+[Function - MDN](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function)
+
+> __`Function` 생성자__는 새 `Function` __객체__를 만듭니다. 이 생성자를 직접적으로 호출하여 동적으로 함수를 생성할 수 있습니다.
+
+> The __`Function` constructor__ creates a new `Function` __object__. Calling the constructor directly can create functions dynamically.
+
+
+```javascript{6-12}
+({})
+  .constructor          // ƒ Object() { [native code] }
+  .constructor          // ƒ Function() { [native code] }
+,
+({})['constructor']['constructor']
+,
+({})[
+  // 'constructor'
+  (![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]
+][
+  // 'constructor'
+  (![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]
+]
+// -> ƒ Function() { [native code] }
+```
+
+
+## 2. p 와 % 를 찾기 위한 여정
+
+### p
+
+
+아래는 p 와 % 를 얻기 위한 여정입니다.
+
+https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/unescape
+
+
+`g` `h` `k` `m` `p` `q` `v` `w` `x` `z` 알파벳을 얻을 수 있는 방법을 알게되었습니다.
+
+http://patriciopalladino.com/blog/2012/08/09/non-alphanumeric-javascript.html
+
+링크를 알려주었다.
+
+```javascript
+({})
+  .constructor          // ƒ Object() { [native code] }
+  .constructor          // ƒ Function() { [native code] }
+  ('return location')   // ƒ anonymous() { return location }
+  ()                    // Location { ... }
+  + []                  // "https://..."
+,
+({})['constructor']['constructor']('return location')() + []
+,
+// ({})['constructor']['constructor']
+({})[(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]][(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]]
+(
+  // 'return location'
+  (!![]+[])[+!![]]+([]+{})[+!![]+[+!![]]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+!![]]+(+{}+{})[+!![]+[+[]]]+(![]+[])[!+[]+!![]]+([]+{})[+!![]]+(![]+{})[+!![]+[+[]]]+(![]+[])[+!![]]+(!![]+[])[+[]]+(![]+[]+[][[]])[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]
+)() + []
+// -> 'https://...'
+```
+
+### %
+
+```javascript
+({})
+  .constructor          // ƒ Object() { [native code] }
+  .constructor          // ƒ Function() { [native code] }
+  ('return escape')     // ƒ anonymous() { return escape }
+  ()                    // ƒ escape() { [native code] }
+  ('[')                 // "%5B"
+,
+({})['constructor']['constructor']('return escape')()('[')
+,
+// ({})['constructor']['constructor']
+({})[(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]][(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]]
+(
+  // 'return escape'
+  (!![]+[])[+!![]]+([]+{})[+!![]+[+!![]]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+!![]]+(+{}+{})[+!![]+[+[]]]+([]+{})[+!![]+[+!![]]]+(![]+[])[!+[]+!![]+!![]]+(![]+{})[+!![]+[+[]]]+(![]+[])[+!![]]+(({})[(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]][(![]+{})[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]]+(![]+[])[!+[]+!![]+!![]]+(!![]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+[]]+(![]+{})[+!![]+[+[]]]+(!![]+[])[+[]]+([]+{})[+!![]]+(!![]+[])[+!![]]]((!![]+[])[+!![]]+([]+{})[+!![]+[+!![]]]+(!![]+[])[+[]]+([][[]]+[])[+[]]+(!![]+[])[+!![]]+([][[]]+[])[+!![]]+(+{}+{})[+!![]+[+[]]]+(![]+[])[!+[]+!![]]+([]+{})[+!![]]+(![]+{})[+!![]+[+[]]]+(![]+[])[+!![]]+(!![]+[])[+[]]+(![]+[]+[][[]])[+!![]+[+[]]]+([]+{})[+!![]]+([][[]]+[])[+!![]])()+[])[+(!+[]+!![]+!![])]+([]+{})[+!![]+[+!![]]]
+)()(
+  // '['
+  ([]+{})[+[]]
+)
+// -> '%5B'
+```
+
+
+
+```javascript
+({})
+  .constructor          // ƒ Object() { [native code] }
+  .constructor          // ƒ Function() { [native code] }
+  ('return unescape')   // ƒ anonymous() { return escape }
+  ()                    // ƒ escape() { [native code] }
+  ('%ud83d%udc4f')      // "👏"
+,
+({})['constructor']['constructor']('return unescape')()('%ud83d%udc4f')
+// -> '👏'
+```
+
+```javascript
+unescape("%" + HEXA_ASCII_VALUE)
+```
+
+with this expression, i can get 'h', 'p'
+
+only 
+
+
+
+ -->
