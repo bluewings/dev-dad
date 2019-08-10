@@ -33,7 +33,7 @@ function Generator({ onChange, placeholder, lang }: any) {
     setRemoveSpace(!removeSpace);
   }, [removeSpace]);
 
-  const [useOperators, setOperators] = useState(true);
+  const [useOperators, setOperators] = useState(false);
   const handleUseOperatorsToggle = useCallback(() => {
     setOperators(!useOperators);
   }, [useOperators]);
