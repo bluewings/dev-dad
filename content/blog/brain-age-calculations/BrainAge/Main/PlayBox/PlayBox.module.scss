@@ -1,0 +1,59 @@
+.wrap {
+  background-color: var(--bg);
+  // border: 1px solid var(--hr);
+  transition: background-color 0.3s linear, color 0.3s linear;
+  // transition: background-color 1s linear;
+  .playbox {
+    width: 300px;
+    height: 450px;
+    .countdown {
+      position: absolute;
+      text-align: center;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      h1 {
+        font-size: 7rem;
+      }
+    }
+  }
+}
+.root {
+  position: relative;
+}
+.rankBadge {
+  color: #fff;
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 30px;
+  // padding: 0 5px;
+  height: 30px;
+  border-bottom-left-radius: 15px;
+  // padding: 0.5rem 0;
+  text-align: center;
+  z-index: 1;
+  // background: rgba(0,0,0,.5) !important;
+}
+
+.playerName {
+  color: #fff;
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  min-width: 30px;
+  // padding: 0 5px;
+  height: 25px;
+  padding-right: 10px;
+  padding-top: 5px;
+  margin: 0 !important;
+  border-top-right-radius: 8px;
+  // padding: 0.5rem 0;
+  text-align: right;
+  z-index: 1;
+  // background: rgba(0,0,0,.5) !important;
+}
