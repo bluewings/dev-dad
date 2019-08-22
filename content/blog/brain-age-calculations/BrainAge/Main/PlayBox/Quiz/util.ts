@@ -29,7 +29,7 @@ const hydrate = ({ x, y, operation, time, userInput }: any) => {
   return [x, y, operation, time, userInput];
 };
 
-const dehydrate = ([operation, x, y]: any) => {
+const dehydrate = ([x, y, operation]: any) => {
   // console.log({ operation, x, y });
   let answer = null;
   if (operation === '+') {

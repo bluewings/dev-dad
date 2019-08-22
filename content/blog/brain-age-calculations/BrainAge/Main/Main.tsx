@@ -79,7 +79,6 @@ function Main({ playbacks = [], onRestart }: any) {
   const handleSolve = useCallback(
     ({ id, quizIndex, missed, timeUsed, record, complete }) => {
       setQuizzes({ id, quizIndex, missed, timeUsed, record, complete });
-      // console.log({ id, quizIndex, missed, timeUsed, complete });
     },
     [setQuizzes],
   );
