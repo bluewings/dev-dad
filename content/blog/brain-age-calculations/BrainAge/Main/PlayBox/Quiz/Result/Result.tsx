@@ -19,23 +19,26 @@ function Result(props: any) {
   const { rank, me, timeUsed, missed, record, quizzes, onRestart } = props;
 
   const handleSubmitClick = useCallback(() => {
-    let playerName = localStorage.getItem('brain-age-player-name');
-    if (!playerName) {
-      playerName = prompt('이름을 알려주세요.');
-      if (playerName) {
-        localStorage.setItem('brain-age-player-name', playerName);
+    try {
+      let playerName = localStorage.getItem('brain-age-player-name');
+      if (!playerName) {
+        playerName = prompt('이름을 알려주세요.');
+        if (playerName) {
+          localStorage.setItem('brain-age-player-name', playerName);
+        }
       }
-    }
 
-    submitPlayRecord({
-      player: playerName || 'unknown',
-      timeUsed,
-      missed,
-      record,
-      quizzes: quizzes.map(hydrate),
-      // ㄱㄷ책ㅇtotal,
-    });
-    onRestart();
+      submitPlayRecord({
+        player: playerName || 'unknown',
+        timeUsed,
+        missed,
+        record,
+        quizzes: quizzes.map(hydrate),
+        // ㄱㄷ책ㅇtotal,
+      });
+
+      onRestart();
+    } catch (err) {}
   }, [submitPlayRecord]);
 
   return (

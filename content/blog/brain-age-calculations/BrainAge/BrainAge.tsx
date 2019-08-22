@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import Intro from './Intro';
 import Main from './Main';
+import Firebase from './Firebase';
 import { getMyPlayerId } from './lib/utils';
 import { usePlayRecords } from './lib/firebase';
 import styles from './BrainAge.module.scss';
@@ -47,4 +48,8 @@ function BrainAge(props: any) {
   );
 }
 
-export default BrainAge;
+function BrainAgeWrap() {
+  return <Firebase>{() => <BrainAge />}</Firebase>;
+}
+
+export default BrainAgeWrap;

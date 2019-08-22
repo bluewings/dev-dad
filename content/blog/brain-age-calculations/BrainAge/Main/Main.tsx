@@ -19,9 +19,7 @@ const initialState = {
 const SET_RANK = 'set-rank';
 
 const compareRank = (a: any, b: any) => {
-
   if (a.quizIndex == b.quizIndex) {
-
     // console.log(a, b);
     if (a.record == b.record) {
       return 0;

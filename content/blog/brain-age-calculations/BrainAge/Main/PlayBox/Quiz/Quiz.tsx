@@ -116,7 +116,7 @@ function Quiz({ rank, me = false, playback, scale, onSolve, onRestart }: any) {
     // if (_quizzes) {
     //   console.log('>>> has record');
     //   console.log(_quizzes);
-    setQuizzes(_quizzes || makeQuizzes(3));
+    setQuizzes(_quizzes || makeQuizzes(20));
     // } else {
     //   console.log('>>> has no record');
     // }
