@@ -6,15 +6,12 @@
   "bugs": {
     "url": "https://github.com/bluewings/dev-dad/issues"
   },
-  "homepage": "https://github.com/gatsbyjs/gatsby-starter-blog#readme",
-  "keywords": [
-    "gatsby"
-  ],
+  "homepage": "https://bluewings.github.io/",
   "license": "MIT",
   "main": "n/a",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bluewings/gatsby-starter-mdx-blog.git"
+    "url": "git+https://github.com/bluewings/dev-dad.git"
   },
   "scripts": {
     "format": "prettier --write '{gatsby-*.js,src/**/*.{js,jsx,ts,tsx,json,css,scss},content/**/*.{js,jsx,ts,tsx,json,css,scss}}'",
