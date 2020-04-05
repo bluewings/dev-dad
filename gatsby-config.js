@@ -1,5 +1,5 @@
 module.exports = {
-  pathPrefix: '/gatsby-plugin-bluewings',
+  pathPrefix: '',
   // Customize your site metadata:
   siteMetadata: {
     title: [

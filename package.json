@@ -1,14 +1,29 @@
 {
-  "name": "website",
+  "name": "dev-dad",
   "private": true,
   "version": "0.0.1",
+  "author": "Cha Sung Won <mygenie3@naver.com>",
+  "bugs": {
+    "url": "https://github.com/bluewings/dev-dad/issues"
+  },
+  "homepage": "https://github.com/gatsbyjs/gatsby-starter-blog#readme",
+  "keywords": [
+    "gatsby"
+  ],
+  "license": "MIT",
+  "main": "n/a",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bluewings/gatsby-starter-mdx-blog.git"
+  },
   "scripts": {
     "format": "prettier --write '{gatsby-*.js,src/**/*.{js,jsx,ts,tsx,json,css,scss},content/**/*.{js,jsx,ts,tsx,json,css,scss}}'",
-    "develop": "gatsby develop",
-    "start": "gatsby develop",
     "build": "gatsby build",
-    "deploy": "gatsby build --prefix-paths && gh-pages -d public -r https://github.com/bluewings/gatsby-plugin-bluewings.git",
-    "clean": "gatsby clean"
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public -r https://github.com/bluewings/bluewings.github.io.git -b master",
+    "develop": "gatsby develop",
+    "start": "npm run develop",
+    "serve": "gatsby serve",
+    "test": "echo \"Write tests! -> https://gatsby.app/unit-testing\""
   },
   "dependencies": {
     "bootstrap": "^4.4.1",
