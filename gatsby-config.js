@@ -35,7 +35,13 @@ module.exports = {
           directory: '',
           branch: 'master',
         },
-        disqusShortname: 'gatsby-starter-mdx-blog',
+        disqusShortname: 'dev-dad',
+      },
+    },
+    {
+      resolve: 'gatsby-plugin-google-analytics',
+      options: {
+        trackingId: 'UA-87089021-5',
       },
     },
   ],
