@@ -1,0 +1,89 @@
+// .root {
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+// }
+.root {
+  padding: 0 1rem;
+  margin-bottom: 1.75rem;
+}
+.chars {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  > li {
+    display: flex;
+    flex-grow: 0;
+    margin: 0;
+    justify-content: center;
+    font-family: 'Cute Font', cursive;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    > div {
+      width: 44px;
+      height: 44px;
+      line-height: 42px;
+      padding: 0;
+      text-align: center;
+      border-radius: 0.3em;
+      @apply bg-blue-200 border-solid border-0 border-b-4 border-blue-400 rounded;
+    }
+    &.odd {
+      > div {
+        @apply bg-red-200 border-solid border-0 border-b-4 border-red-400 rounded;
+      }
+    }
+  }
+}
+:global(.dark) {
+  .chars {
+    > li {
+      > div {
+        @apply bg-blue-900 border-solid border-0 border-b-4 border-blue-700 rounded;
+      }
+      &.odd {
+        > div {
+          @apply bg-red-900 border-solid border-0 border-b-4 border-red-700 rounded;
+        }
+      }
+    }
+  }
+}
+.stage {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  > li {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    text-align: center;
+    justify-content: center;
+    font-family: Merriweather;
+    font-weight: bold;
+    .shim {
+      margin-left: 5%;
+      width: 90%;
+      height: 20px;
+      border: 1px dashed #888;
+      border-top: none;
+    }
+    .num {
+    }
+  }
+}

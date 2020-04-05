@@ -1,0 +1,222 @@
+---
+title: Playing with Fonts
+date: "2019-06-23T01:58:01.363Z"
+---
+
+import WarpText, { transform1, transform2, transform3, transform4, transformA1, transformA2, paddingTop, paddingTop4,  } from './examples/WarpText';
+import JsonTree from './examples/JsonTree';
+import Trigonometric from './examples/Trigonometric';
+
+[Google Fonts + 한국어](https://googlefonts.github.io/korean/) site has some amazing typographic effects. Some of them can't be implemented with CSS alone, so I wanted to make them myself.
+
+Among them, I have implemented waving text in code. The result of the coding is as follows.
+
+<WarpText message='Developer' fontFamily='Montserrat' animate />
+
+To implement the effects, the following steps have been taken: The detailed step-by-step process is described below.
+
+1. Converts text to vector.
+2. Draw text with SVG or Canvas.
+3. Use transform function to change the path.
+4. Repeat step 3. (Animation)
+
+-----
+
+## 1. Converts text to vector.
+
+I searched for "font parser" and found [opentype.js](https://opentype.js.org/).
+
+> opentype.js is a JavaScript parser and writer for TrueType and OpenType fonts.
+
+After loading the font using the [API](https://github.com/opentypejs/opentype.js#fontstringtoglyphsstring), you can see how to bring the glyph of the letter.
+
+```js
+import { load } from 'opentype.js';
+
+load('montserrat.woff', (err, font) => {
+  const glyphs = font.stringToGlyphs('Developer');
+  console.log(glyphs);
+});
+```
+
+<JsonTree message='Developer' />
+
+If you check the execution results, you can get information about the glyphs for each character, and there is information in path.commands that can be drawn. (Click each node to see detailed information)
+
+## 2. Draw text with SVG or Canvas.
+
+You can draw the SVG path with the information contained in path.commands. If you use Canvas, you can use the following method. [moveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/moveTo), [lineTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo), [quadraticCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/quadraticCurveTo), [bezierCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/bezierCurveTo)
+
+I drew a path and point in SVG with path.commands information.
+
+REF: [Paths - SVG: Scalable Vector Graphics | MDN](https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/Paths#%EC%84%A0(Line)_%EB%AA%85%EB%A0%B9%EC%96%B4)
+
+<WarpText
+  message='Developer'
+  fontFamily='Montserrat'
+  outline
+  transform={null}
+  padding={10}
+  paddingTop={2}
+  paddingBottom={2}
+/>
+
+## 3. Use transform function to change the path.
+
+I searched for a library called [Warp.js](https://benjamminf.github.io/warpjs/). This library allows you to distort the path of SVG into a form using user-defined functions. See [Warp.js example](https://codepen.io/benjamminf/pen/NpZLeb)
+
+Using trigonometric functions seems to be able to show shaking effects. In the result of the previous step, the following results are obtained when the y coordinate is converted using the Sine function. Voila!
+
+```js
+const warp = new Warp(svg);
+
+warp.transform(([ x, y ]) => [ x, y + 15 * Math.sin(x / 50) ]);
+```
+
+<WarpText message='Developer' fontFamily='Montserrat' outline />
+
+## 4. Repeat step 3. (Animation)
+
+If you keep moving the Sine function and draw it, you can see the following animation.
+
+<Trigonometric />
+
+Applying this to the text is as follows.
+
+If you want to maintain the same speed regardless of the device's performance, you can use the offset value of time as a factor.
+
+<WarpText message='Developer' fontFamily='Montserrat' animate />
+
+```js
+const warp = new Warp(svg);
+
+// Apply x and y values to the third and fourth arguments
+// to remember the coordinates of the original before applying the animation
+warp.transform(([x, y]) => [x, y, x, y]);
+
+// start time
+const startAt = new Date().valueOf();
+
+function animate() {
+  // time of current frame
+  const offset = (new Date().valueOf() - startAt) / 1000;
+  // compute coordinates from the original coordinate values and pass the original values intact
+  warp.transform(([x, y, ox, oy]) => [
+    x,
+    oy + 15 * Math.sin(x / 50 + offset),
+    ox,
+    oy,
+  ]);
+  requestAnimationFrame(animate);
+}
+
+animate();
+```
+
+-----
+
+## Other transform functions
+
+You can change the transform function to create different effects.
+
+<WarpText
+  message='NEMO x DORY'
+  fontFamily='Montserrat'
+  transform={transform1}
+  animate
+  paddingTop={2}
+/>
+
+```js
+function transform([x, y, { innerHeight, scale, offset }]) {
+  const wave = scale(0.2);
+  const z = Math.max(0, y / innerHeight - 0.1);
+  return [
+    x,
+    y + wave * Math.sin((x + scale(offset) / 400 / 2) / scale(0.5)) * z,
+  ];
+}
+```
+
+<div style={{ height: '2.5rem' }} />
+
+<WarpText
+  message='Brrrr...'
+  fontFamily='Montserrat'
+  transform={transform2}
+  animate
+  interpolate={20}
+  paddingTop={2}
+  paddingBottom={2}
+/>
+
+```js
+function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.02);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 2000) / scale(0.05)),
+    y + wave * Math.sin((x + scale(offset) / 2000) / scale(0.05)),
+  ];
+}
+```
+
+<div style={{ height: '2.5rem' }} />
+
+<WarpText
+  message='feel dizzy...'
+  fontFamily='Cute Font'
+  transform={transform3}
+  animate
+  interpolate={20}
+  padding={paddingTop}
+/>
+
+```js
+function transform([x, y, { scale, offset }]) {
+  const wave = scale(0.2);
+  return [
+    x + wave * Math.sin((y + scale(offset) / 1000) / scale(0.5)),
+    y + wave * Math.sin((x + scale(offset) / 1000) / scale(0.5)),
+  ];
+}
+```
+
+<div style={{ height: '2.5rem' }} />
+
+<div style={{ position: 'relative', maxWidth: 600 }}>
+  <WarpText
+    message="SUWON"
+    fontFamily='Montserrat'
+    transform={transformA1}
+    color="silver"
+    paddingRight={200}
+    paddingBottom={150}
+  />
+  <div style={{ position: 'absolute', top: 0, width: '100%' }}>
+    <WarpText message="SUWON"
+      fontFamily='Montserrat'
+      transform={transformA2}
+      paddingRight={200}
+      paddingBottom={200}
+    />
+  </div>
+</div>
+
+```js
+function transformA1([x, y, { innerHeight }]) {
+  return [
+    x + innerHeight - y,
+    innerHeight * 0.5 + y * 0.5 + x / 3,
+  ];
+}
+function transformA2([x, y]) {
+  return [
+    x,
+    y + x / 3,
+  ];
+}
+
+```
+
+<div style={{ height: '2.5rem' }} />
+

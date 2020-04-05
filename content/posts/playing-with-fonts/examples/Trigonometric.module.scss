@@ -1,0 +1,13 @@
+.root {
+  margin-bottom: 1.75rem;
+  svg {
+    stroke-width: 1;
+    stroke: #888;
+    fill: none;
+    .graph,
+    .joint {
+      stroke: var(--theme-ui-colors-text);
+      fill: var(--theme-ui-colors-text);
+    }
+  }
+}

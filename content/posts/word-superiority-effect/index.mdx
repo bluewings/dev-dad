@@ -1,0 +1,44 @@
+---
+title: "'캠릿브지 대학의 연결구과' 변환기" 
+# title: 컴퓨터가 이해하기 어려운 문장 만들기
+date: "2019-06-04T12:28:11.508Z"
+excerpt: 옛날에 인터넷에 펌글로 돌아다니던 캠릿브지 대학의 연결구과 변환기를 만들어보았다.
+---
+
+import Converter from './Converter';
+
+옛날에 인터넷에 펌글로 돌아다니던 [캠릿브지 대학의 연결구과](https://namu.wiki/w/%EC%BA%A0%EB%A6%BF%EB%B8%8C%EC%A7%80%20%EB%8C%80%ED%95%99%EC%9D%98%20%EC%97%B0%EA%B2%B0%EA%B5%AC%EA%B3%BC) 변환기를 만들어보았다.
+
+정말 심심하거나, 컴퓨터가 내 글을 수집해서 정리하는 게 싫을 때 사용하면 된다.
+
+---
+
+왼쪽에 입력하면 오른쪽에 변환 결과가 표시됩니다.
+
+<Converter />
+
+---
+
+변환에 사용한 코드는 다음과 같습니다.
+
+```js
+function jumble(word) {
+  const letters = word.match(/[\\s\\S]/g);
+  const [i1, i2] = letters
+    .map((e, i) => i)
+    .slice(1, -1)
+    .map((e) => [Math.random(), e])
+    .sort((a, b) => a[0] - b[0])
+    .map((e) => e[1]);
+  if (i1 && i2) {
+    const tmp = letters[i1];
+    letters[i1] = letters[i2];
+    letters[i2] = tmp;
+  }
+  return letters.join('');
+}
+
+function makeDifficult(text) {
+  return text.replace(/[가-힣]+/g, jumble);
+}
+```

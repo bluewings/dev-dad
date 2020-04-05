@@ -10,6 +10,7 @@
     "clean": "gatsby clean"
   },
   "dependencies": {
+    "d3": "^5.15.1",
     "d3-scale": "^3.2.1",
     "gatsby": "^2.20.12",
     "gatsby-plugin-bluewings": "^0.3.57",
@@ -17,6 +18,9 @@
     "node-sass": "^4.13.1",
     "pretty": "^2.0.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-textarea-autosize": "^7.1.2",
+    "react-warp-text": "^0.1.11",
+    "warpjs": "^1.0.8"
   }
 }
