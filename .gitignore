@@ -26,6 +26,7 @@ tsconfig.tsbuildinfo
 package-lock.json
 yarn.lock
 
-content
+content/_nextPosts
+content/_posts
 .cache
 public

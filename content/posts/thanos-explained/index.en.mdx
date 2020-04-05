@@ -1,0 +1,209 @@
+---
+title: Thanos Easter Egg, How it works
+date: "2019-05-10T14:34:36.458Z"
+max_width: 58rem
+---
+
+import { useEffect, useState } from 'react';
+import { Scrollama } from 'gatsby-plugin-bluewings';
+import { Context, Code } from 'gatsby-plugin-bluewings';
+import Sample from './Sample';
+import Gimmick from './Gimmick';
+import Example from './Example';
+import Example2 from './Example2';
+
+[](@grid)
+
+With the release of Avengers: Endgame (2019), Google added an Easter Egg to its search results page. When you search for Thanos on Google, you will see an Infinity Gauntlet icon on the right, and when you click on it, half of the search results disappear into the dust.
+
+My son sees Easter Egg and asks, "Dad, Can you do that?" I said, "Maybe?" But I do not have any idea how to implement it. After all, Using browser's developer tools, I looked at how it works. Easter Egg was expected to be complex, but was implemented in a very simple way, contrary to my expectation.
+
+To view the demo, click on the Infinity Guntlet on the right.
+
+[](@grid)
+
+<Example/>
+
+[](@gridend)
+
+---
+
+Web pages turn into dust in three steps below.
+
+1. **Capture the screenshot**: Capture screenshot of original element using the [html2canvas](https://html2canvas.hertzen.com/) library.
+2. **Split into multiple layers**: Create an [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) instance of the same size as the original, and get the data from each pixel of the original screenshot and move it to any [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) instance. After [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) is reflected, update it on each [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas).
+3. **Rotate and move layers**: Rotate each [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) layer at any angle and adjust the opacity to gradually become invisible.
+
+---
+
+Let's take a step-by-step look at the example along with the code.
+
+[](@context)
+
+[](@grid,overflow=auto)
+
+[](@section.step)
+
+## 1. Capture the screenshot
+
+The example on the right is written with the following HTML code.
+
+<Context>{({ value }) => (
+  <Code codeString={value.html || ''} language="html" />
+)}</Context>
+
+For the next step, you need to convert the element with the HTML hierarchy to an image. And you can use the [html2canvas] (https://html2canvas.hertzen.com/) library to get a screenshot of a specific HTML element.
+
+```js
+import html2canvas from 'html2canvas';
+
+html2canvas(element, {
+  backgroundColor: null,
+}).then((canvas) => {
+  // doSomething(canvas);
+});
+```
+
+[](@sectionend)
+
+[](@section.step,@stage=capture)
+
+Run the above code to create a screenshot of the target element. (click)
+
+[](@sectionend)
+
+[](@grid)
+
+<Context>
+  {({ setValue }) => {
+    const handleScreenshotCapture = (canvas) => {
+      if (canvas) {
+        setValue('screenshot', canvas);
+      }
+    };
+    const handleSampleLoad = (html) => {
+      setValue('html', html);
+    };
+    return (
+      <div style={{ position: 'sticky', top: 0 }}>
+        <Scrollama step=".step" offset="0.5" progress>
+          {({ index_ }) => (
+            <div>
+              <Sample
+                type="text"
+                capture={index_ > 0}
+                onCapture={handleScreenshotCapture}
+                onLoad={handleSampleLoad}
+              />
+            </div>
+          )}
+        </Scrollama>
+      </div>
+    );
+  }}
+</Context>
+
+[](@gridend)
+
+[](@grid,layoutFixed)
+
+## 2. Split into multiple layers
+
+At this stage, each pixel of the original screenshot is randomly divided into several [canvases](https://developer.mozilla.org/docs/Web/HTML/Canvas).
+
+[Canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) uses the [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) interface to represent pixel data in the area.  In each of the steps below, we will create, read, and move [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData).
+
+[](@section.step,@stage=create-image-data)
+
+### Create an ImageData instance of the same size as the original.
+
+Use the [createImageData](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/createImageData) function to create a set number of empty [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) of the same size as the original.
+
+```js
+const ctx = canvas.getContext('2d');
+const width = canvas.width;
+const height = canvas.height;
+
+const layers = new Array(numOfLayers)
+  .fill(null)
+  .map(() => ctx.createImageData(width, height));
+```
+
+[](@section.step,@stage=move-image-data)
+
+### Get ImageData for each pixel in the original screenshot and move it to any ImageData instance.
+
+[getImageData](https://developer.mozilla.org/docs/Web/API/CanvasRenderingContext2D/getImageData) function gets the [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) of the original screenshot, then traverses all the pixels and moves each pixel's [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) randomly to any [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) instance.
+
+```js
+const imageData = ctx.getImageData(0, 0, width, height);
+for (let x = 0; x < width; x += 1) {
+  for (let y = 0; y < height; y += 1) {
+    const i = Math.floor(
+      (numOfLayers * (Math.random() + (2 * x) / width)) / 3,
+    );
+    const p = 4 * (y * width + x);
+    for (let j = 0; j < 4; j += 1) {
+      layers[i].data[p + j] = imageData.data[p + j];
+    }
+  }
+}
+```
+
+[](@section.step,@stage=overlap-canvases,minHeight=50vh)
+
+### After all ImageData is reflected, update on each canvas.
+
+When all [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData) is ready, create a [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) and draw a image using that [ImageData](https://developer.mozilla.org/docs/Web/API/ImageData). Pixels are scattered in each [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) layer, but they are not much different from the original in layering.
+
+```js
+layers.map((layer) => {
+  const clone = canvas.cloneNode();
+  clone.getContext('2d').putImageData(layer, 0, 0);
+  return clone;
+});
+```
+
+[](@section)
+
+## 3. Rotate and move layers
+
+[](@section.step,@stage=rotate-and-fade-out,minHeight=300px)
+
+When the [canvas](https://developer.mozilla.org/docs/Web/HTML/Canvas) layer is ready, the effect is completed by using the css [transform](https://developer.mozilla.org/docs/Web/CSS/transform) and [opacity](https://developer.mozilla.org/docs/Web/CSS/opacity) to rotate each layer sequentially at any angle and make it transparent.
+
+[](@sectionend)
+
+[](@grid)
+
+<Context>
+  {({ value }) => (
+    <div style={{ position: 'sticky', top: 0 }}>
+      <Scrollama step=".step" offset="0.5" progress debug={true}>
+        {({ index_, stage, stageProgress: progress }) =>
+          value.screenshot && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+              justifyContent: 'center',
+            }}>
+              <Gimmick
+                show={index_ > 0}
+                screenshot={value.screenshot}
+                stage={stage}
+                progress={progress}
+              />
+            </div>
+          )
+        }
+      </Scrollama>
+    </div>
+  )}
+</Context>
+
+[](@gridend)
+
+<Example2>
+  <h1>THE END</h1>
+</Example2>

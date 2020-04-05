@@ -1,0 +1,93 @@
+.root {
+  line-height: 1.54;
+  a {
+    h3 {
+      margin-top: 0 !important;
+    }
+  }
+  a {
+    box-shadow: none;
+    &:hover {
+      h3 {
+        text-decoration: underline;
+      }
+    }
+  }
+  h3 {
+    color: #00c;
+    color: #1a0dab;
+    color: #6cb2eb;
+    color: #2779bd;
+    color: #007acc;
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  cite {
+    color: #006621;
+    color: #51d88a;
+    color: #1f9d55;
+    line-height: 1.43;
+    font-style: normal;
+  }
+  p {
+    margin: 0;
+    display: block;
+  }
+}
+
+:global(.dark) {
+  .root {
+    h3 {
+      color: #6cb2eb;
+    }
+    cite {
+      color: #51d88a;
+    }
+  }
+}
+
+.cardWrap {
+  // line-height: 0;
+  display: flex;
+}
+.card {
+  display: inline-block;
+  margin: 0.5rem;
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: 0.3em;
+  background: var(--translation-bg);
+  background: rgba(255, 255, 255, 0.5);
+  width: 200px;
+  height: 220px;
+  overflow: hidden;
+
+  .image {
+    position: relative;
+    padding: 0.5rem;
+
+    z-index: 1;
+  }
+  .text {
+    h1,
+    h2,
+    h3 {
+      position: absolute;
+      display: block;
+      bottom: -2px;
+      left: -20px;
+      right: -20px;
+      z-index: 2;
+      margin: 0;
+      text-align: center;
+      background: #007acc;
+      color: #fff;
+      padding: 0.5rem 1.5rem 2rem;
+
+      transform: translateY(20px) rotate(-5deg);
+      overflow: visible;
+    }
+  }
+}
