@@ -6,7 +6,7 @@ module.exports = {
       ['ko', '아빠는 개발자'],
       ['en', 'Dev Dad'],
     ],
-    author: 'My Name',
+    author: 'Cha Sung Won',
     description: [
       [
         'ko',
