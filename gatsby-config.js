@@ -1,5 +1,5 @@
 module.exports = {
-  pathPrefix: '',
+  // pathPrefix: '/',
   // Customize your site metadata:
   siteMetadata: {
     title: [
