@@ -1,0 +1,22 @@
+{
+  "name": "website",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "develop": "gatsby develop",
+    "start": "gatsby develop",
+    "build": "gatsby build",
+    "deploy": "gatsby build --prefix-paths && gh-pages -d public -r https://github.com/bluewings/gatsby-plugin-bluewings.git",
+    "clean": "gatsby clean"
+  },
+  "dependencies": {
+    "d3-scale": "^3.2.1",
+    "gatsby": "^2.20.12",
+    "gatsby-plugin-bluewings": "^0.3.57",
+    "gh-pages": "^2.2.0",
+    "node-sass": "^4.13.1",
+    "pretty": "^2.0.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
