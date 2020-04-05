@@ -103,7 +103,10 @@ function getScore(name1: any, name2: any) {
       ([accum1, accum2], e, i) => {
         const [char1, num1] = symbols1[i] || ['', 0];
         const [char2, num2] = symbols2[i] || ['', 0];
-        return [[...accum1, char1, char2], [...accum2, num1, num2]];
+        return [
+          [...accum1, char1, char2],
+          [...accum2, num1, num2],
+        ];
       },
       [[], []],
     );

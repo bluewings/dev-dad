@@ -4,7 +4,7 @@ import Sample from '../Sample';
 import Gimmick from '../Gimmick';
 import styles from './Example2.module.scss';
 
-const Test =         ({ index, progress_, children }: any) => {
+const Test = ({ index, progress_, children }: any) => {
   const [screenshot, setScreenshot] = useState();
   const handleScreenshotCapture = (canvas: any) => {
     if (canvas) {
@@ -18,11 +18,7 @@ const Test =         ({ index, progress_, children }: any) => {
           <div className={styles.sampleWrap}>{children}</div>
         </Sample>
       </div>
-      <div
-        className={`${styles.gimmick} ${
-          progress_ > 0 && screenshot && progress_ !== 1 ? '' : styles.invisible
-        }`}
-      >
+      <div className={`${styles.gimmick} ${progress_ > 0 && screenshot && progress_ !== 1 ? '' : styles.invisible}`}>
         <Gimmick
           show
           stage="rotate-and-fade-out"
@@ -37,22 +33,18 @@ const Test =         ({ index, progress_, children }: any) => {
 };
 
 function Example2({ children }: any) {
-  const className = useMemo(
-    () =>
-      `ex-${Math.random()
-        .toString(36)
-        .substr(-8)}`,
-    [],
-  );
+  const className = useMemo(() => `ex-${Math.random().toString(36).substr(-8)}`, []);
 
   return (
     <div className={`${styles.root} ${className}`}>
       <Scrollama step={`.${className}`} offset=".5" progress>
-      {({ index, progress_ }: any) => {
-        return (
-        <Test index={index} progress_={progress_}>{children}</Test>
-        )
-      }}
+        {({ index, progress_ }: any) => {
+          return (
+            <Test index={index} progress_={progress_}>
+              {children}
+            </Test>
+          );
+        }}
       </Scrollama>
     </div>
   );

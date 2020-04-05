@@ -96,9 +96,7 @@ function Calculator({ onCasesChange }: any) {
     } catch (err) {
       /* ignore */
     }
-    return shuffle(seed)
-      .slice(0, 8)
-      .join(' ');
+    return shuffle(seed).slice(0, 8).join(' ');
   }, []);
 
   const [text, setText] = useState(sample);
@@ -136,9 +134,7 @@ function Calculator({ onCasesChange }: any) {
         const info1 = getScore(name1, name2);
         const info2 = getScore(name2, name1);
         items.push({
-          id: Math.random()
-            .toString(36)
-            .substr(-7),
+          id: Math.random().toString(36).substr(-7),
           names: [name1, name2],
           info1,
           info2,
@@ -210,11 +206,7 @@ function Calculator({ onCasesChange }: any) {
     event.preventDefault();
     // @ts-ignore
     setQuery(event.target.innerText.replace(/\s/g, ''));
-    setTick(
-      Math.random()
-        .toString(36)
-        .substr(-7),
-    );
+    setTick(Math.random().toString(36).substr(-7));
   };
   const BASE = '가'.charCodeAt(0);
 

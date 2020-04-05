@@ -70,8 +70,9 @@ const vanish = async (target: HTMLElement, options: any) => {
           canvasGroup.appendChild(clone);
           setTimeout(() => {
             const rad = 2 * Math.PI * (Math.random() - 0.5);
-            const transform = `rotate(${15 * (Math.random() - 0.5)}deg) translate(${60 * Math.cos(rad)}px, ${30 *
-              Math.sin(rad)}px)`;
+            const transform = `rotate(${15 * (Math.random() - 0.5)}deg) translate(${60 * Math.cos(rad)}px, ${
+              30 * Math.sin(rad)
+            }px)`;
             clone.style.transitionDelay = `${(duration * i) / 32}s`;
             clone.style.transform = transform;
             clone.style.opacity = '0';

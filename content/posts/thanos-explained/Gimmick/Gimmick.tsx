@@ -44,10 +44,7 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }: any
         .clamp(true);
       const transitionDelay = (1 - (1 - i / (arr.length - 1))) / 2;
       const to = Math.min(transitionDelay + 0.5);
-      const scaleDelay = scaleLinear()
-        .domain([transitionDelay, to])
-        .range([0, 1])
-        .clamp(true);
+      const scaleDelay = scaleLinear().domain([transitionDelay, to]).range([0, 1]).clamp(true);
       return {
         canvas,
         transformFn: (value: any) => {
@@ -132,10 +129,7 @@ function Gimmick({ screenshot, stage, progress, numOfLayers, frame = true }: any
 
   const getContainerStyles = useMemo(() => {
     if (stage === CREATE_IMAGE_DATA || stage === OVERLAP_CANVASES) {
-      const scaled = scaleLinear()
-        .domain([0.8, 0.2])
-        .range([0, 1])
-        .clamp(true);
+      const scaled = scaleLinear().domain([0.8, 0.2]).range([0, 1]).clamp(true);
       const cache: any = {};
       return (progress_: number) => {
         const p1 = scaled(stage === CREATE_IMAGE_DATA ? 1 - progress_ : progress_);

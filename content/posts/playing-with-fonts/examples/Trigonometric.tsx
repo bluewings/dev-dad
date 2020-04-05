@@ -58,8 +58,9 @@ function Trigonometric({ radius = 45, padding = 5 }) {
 
         pathRadius.current.setAttribute(
           'd',
-          `M ${radius * 2} ${radius} L ${radius} ${radius} L ${x} ${y} L ${radius * 2 +
-            padding * 3} ${y} M ${radius} ${radius} Z`,
+          `M ${radius * 2} ${radius} L ${radius} ${radius} L ${x} ${y} L ${
+            radius * 2 + padding * 3
+          } ${y} M ${radius} ${radius} Z`,
         );
 
         joint1.current.setAttribute('cx', x);

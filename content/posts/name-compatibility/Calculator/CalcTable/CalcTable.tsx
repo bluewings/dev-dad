@@ -1,6 +1,6 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import {Styled} from 'theme-ui';
+import { Styled } from 'theme-ui';
 import styles from './CalcTable.module.scss';
 
 function CalcTable(props) {

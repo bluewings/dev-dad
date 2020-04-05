@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
+    "format": "prettier --write '{gatsby-*.js,src/**/*.{js,jsx,ts,tsx,json,css,scss},content/**/*.{js,jsx,ts,tsx,json,css,scss}}'",
     "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
@@ -10,17 +11,22 @@
     "clean": "gatsby clean"
   },
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "d3": "^5.15.1",
     "d3-scale": "^3.2.1",
     "gatsby": "^2.20.12",
     "gatsby-plugin-bluewings": "^0.3.57",
     "gh-pages": "^2.2.0",
     "node-sass": "^4.13.1",
+    "prettier": "^2.0.2",
     "pretty": "^2.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-firebase-hooks": "^2.1.1",
+    "react-scaled-content": "^0.1.2",
     "react-textarea-autosize": "^7.1.2",
     "react-warp-text": "^0.1.11",
+    "use-immer": "^0.3.5",
     "warpjs": "^1.0.8"
   }
 }

@@ -51,15 +51,9 @@ function useD3Chord(cases: any, width = 600, height = 600) {
       const outerRadius = Math.min(width, height) * 0.5 - 1;
       const innerRadius = outerRadius - 50;
 
-      const chord = d3
-        .chord()
-        .padAngle(0.05)
-        .sortSubgroups(d3.descending);
+      const chord = d3.chord().padAngle(0.05).sortSubgroups(d3.descending);
 
-      const arc = d3
-        .arc()
-        .innerRadius(innerRadius)
-        .outerRadius(outerRadius);
+      const arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
 
       const ribbon = d3.ribbon().radius(innerRadius);
 
@@ -74,11 +68,7 @@ function useD3Chord(cases: any, width = 600, height = 600) {
 
       const chords = chord(data);
 
-      const group = svg
-        .append('g')
-        .selectAll('g')
-        .data(chords.groups)
-        .join('g');
+      const group = svg.append('g').selectAll('g').data(chords.groups).join('g');
 
       group
         .append('path')
