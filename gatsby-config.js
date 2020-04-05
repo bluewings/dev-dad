@@ -44,17 +44,18 @@ module.exports = {
         trackingId: 'UA-87089021-5',
       },
     },
-    {
-      resolve: 'gatsby-plugin-manifest',
-      options: {
-        name: 'Gatsby Starter Blog',
-        short_name: 'GatsbyJS',
-        start_url: '/',
-        background_color: '#ffffff',
-        theme_color: '#663399',
-        display: 'minimal-ui',
-        icon: 'content/assets/gatsby-icon.png',
-      },
-    },
+    // {
+    //   resolve: 'gatsby-plugin-manifest',
+    //   options: {
+    //     name: 'Gatsby Starter Blog',
+    //     short_name: 'GatsbyJS',
+    //     start_url: '/',
+    //     background_color: '#ffffff',
+    //     theme_color: '#663399',
+    //     display: 'minimal-ui',
+    //     icon: 'content/assets/gatsby-icon.png',
+    //     icons: [],
+    //   },
+    // },
   ],
 };
