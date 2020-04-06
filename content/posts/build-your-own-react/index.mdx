@@ -1,0 +1,804 @@
+---
+title: 나만의 리액트 라이브러리 만들기
+date: "2020-04-05T05:12:53.991Z"
+max_width: 58rem
+---
+
+import { CodeWave } from "gatsby-plugin-bluewings"
+import ImageWaveLocal from "./image-wave-local"
+
+> 이 글은 [Rodrigo Pombo](https://pomb.us/)의 [Build your own React](https://pomb.us/build-your-own-react/)의 한국어 버전입니다.
+>
+> 번역은 [나만의 리액트 라이브러리 만들기](https://velog.io/@godori/build-your-own-react)을 참고하였으며, 사용을 허락해주신 [godori](https://velog.io/@godori)님께 감사드립니다.
+
+-----
+
+우리는 리액트를 처음부터 직접 만들어 볼 것입니다. 최적화나 필수적이지 않은 기능들은 제외하고, 실제 리액트 코드 구조를 기반으로 한 단계씩 따라가 봅시다.
+
+[이전에 올린 "build your own React" 포스트](https://engineering.hexacta.com/didact-learning-how-react-works-by-building-it-from-scratch-51007984e5c5)들과는 달리 이번 포스트에서는 리액트 16.8 버전을 기반으로 하고 있습니다. 이제 훅을 사용할 수 있으며, 클래스와 관련된 코드를 제거할 수 있습니다.
+
+이전의 오래된 블로그 포스트와 코드의 히스토리는 [Didact repo](https://github.com/pomber/didact)에서 확인할 수 있습니다. 또, [동일한 내용을 다루는 콘텐츠](https://youtu.be/8Kc2REHdwnQ)도 있지만, 이는 그와 독립적인 포스트입니다.
+
+우리가 새롭게 만들 버전의 리액트에 들어갈 내용들을 하나씩 소개합니다:
+
+- **Step I**: `createElement` 함수
+- **Step II**: `render` 함수
+- **Step III**: 동시성 모드 (Concurrent Mode)
+- **Step IV**: Fibers
+- **Step V**: 렌더와 커밋 단계 (Render and Commit Phases)
+- **Step VI**: 재조정 (Reconciliation)
+- **Step VII**: 함수형 컴포넌트 (Function Components)
+- **Step VIII**: 훅 (Hooks)
+
+<CodeWave>
+
+```jsx
+const element = <h1 title="foo">Hello</h1>
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
+```
+
+## Step Zero: Review
+
+먼저 기본 개념을 복습해 보겠습니다. React, JSX, DOM 엘리먼트가 동작하는 방식을 이미 잘 알고 있다면 이 단계는 건너 뛰어도 됩니다.
+
+이 3줄짜리 코드로 된 리액트 앱을 사용할 것입니다. 첫 번째 줄은 리액트 엘리먼트를 정의합니다. 그다음 DOM으로부터 노드를 얻습니다. 마지막으로, 컨테이너 안에 리액트 엘리먼트를 생성합니다.
+
+**이제 리액트 특유의 코드를 모두 제거하고 이를 순수한 바닐라 자바스크립트로 교체해 봅시다.**.
+
+```jsx 1
+const element = <h1 title="foo">Hello</h1>
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
+```
+
+맨 첫 줄에, JSX로 정의된 엘리먼트가 있습니다. 이는 자바스크립트에서 유효한 문법이 아니므로 바닐라 JS로 교체하기 위해서는 유효한 JS 코드가 필요합니다.
+
+JSX는 바벨과 같은 빌드 툴에 의해 JS 코드로 변환됩니다. 변환은 대체로 간단합니다. 태그 이름, props, `children`를 매개변수로 넘기는 `createElement` 함수를 호출하여 태그 내부의 코드를 바꾸면 됩니다.
+
+```jsx
+const element = React.createElement(
+  "h1",
+  { title: "foo" },
+  "Hello"
+)
+
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
+```
+
+`React.createElement`는 인자 값들로 객체를 생성합니다. 몇 가지 유효성 검사를 제외하고는 이게 전부입니다. 따라서 안전하게 함수 호출 부분을 그 결과물로 바꿀 수 있습니다.
+
+```jsx
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
+```
+
+그리고 바로 이 element가 `type`과 `props`를 객체 속성 값으로 가지는 객체입니다. (사실 [실제로는 더 많은 속성](https://github.com/facebook/react/blob/f4cc45ce962adc9f307690e1d5cfa28a288418eb/packages/react/src/ReactElement.js#L111)이 있지만, 여기서는 두 가지만 신경 쓰도록 합니다)
+
+`type`은 우리가 생성하려는 DOM 노드의 타입을 지정하는 문자열입니다. `tagName`은 HTML 엘리먼트를 생성할 때 `document.createElement`에 전달하는 값입니다. 이 부분은 7단계에서 보도록 하겠습니다.
+
+`props`는 JSX 속성의 key와 value를 포함하고 있는 또 하나의 객체입니다. 이 역시 특별한 `children`이라는 특별한 속성을 가집니다.
+
+이 예제에서 `children`은 문자열입니다. 하지만 일반적으로 더 많은 엘리먼트의 배열의 형태입니다. 이것이 엘리먼트들이 트리 형태인 이유입니다.
+
+```jsx 10
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+ReactDOM.render(element, container)
+```
+
+교체해야 할 리액트 코드의 다른 부분은 `ReactDOM.render`라고 부르는 것입니다.
+
+`render`는 리액트가 DOM을 변경하는 지점으로, 이제 우리가 직접 업데이트를 할 수 있게 해 봅시다.
+
+```jsx 1,2,4,7,11,12
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+
+const node = document.createElement(element.type)
+node["title"] = element.props.title
+
+const text = document.createTextNode("")
+text["nodeValue"] = element.props.children
+
+node.appendChild(text)
+container.appendChild(node)
+```
+
+먼저 엘리먼트의 `type`을 이용해 노드를 생성합니다. 이 경우 타입은 `h1`입니다.
+
+그리고 모든 엘리먼트 `props`들을 노드에 할당합니다. 지금은 title 뿐입니다.
+
+_\* 여기서 "엘리먼트"는 리액트 엘리먼트를, "노드"는 DOM 엘리먼트를 의미합니다._
+
+```js 1,5,7,14,15
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+
+const node = document.createElement(element.type)
+node["title"] = element.props.title
+
+const text = document.createTextNode("")
+text["nodeValue"] = element.props.children
+
+node.appendChild(text)
+container.appendChild(node)
+```
+
+다음으로, 자식 노드들을 생성합니다. 현재 자식 노드는 문자열 하나뿐이므로, 텍스트 노드 하나를 생성합니다.
+
+이때 `innterText`를 설정하는 대신 `textNode`를 사용하면 모든 엘리먼트들을 이후에 동일한 방식으로 다룰 수 있습니다. `h1`에 title을 할당한 것을 참고하여 `nodeValue`의 값을 설정합니다. 이는 문자열이 마치 `props: {nodeValue: "hello"}` 값을 가지는 것과 비슷합니다.
+
+```js 9,17,18
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+
+const node = document.createElement(element.type)
+node["title"] = element.props.title
+
+const text = document.createTextNode("")
+text["nodeValue"] = element.props.children
+
+node.appendChild(text)
+container.appendChild(node)
+```
+
+마지막으로 `textNode`를 `h1`에 추가하고, 이 `h1`을 `container`에 추가합니다.
+
+```js 1:18
+const element = {
+  type: "h1",
+  props: {
+    title: "foo",
+    children: "Hello",
+  },
+}
+
+const container = document.getElementById("root")
+
+const node = document.createElement(element.type)
+node["title"] = element.props.title
+
+const text = document.createTextNode("")
+text["nodeValue"] = element.props.children
+
+node.appendChild(text)
+container.appendChild(node)
+```
+
+자, 이제 리액트를 사용하지 않고 그것과 동일한 앱을 완성했습니다.
+
+</CodeWave>
+
+<CodeWave>
+
+```jsx file=./00.jsx
+```
+
+## Step I: createElement 함수
+
+다시 다른 앱으로 시작해 봅시다. 여기서는 리액트 코드를 우리가 직접 만든 버전으로 교체해 볼 것입니다.
+
+우리가 만든 `createElement`를 입력하는 것부터 시작해 봅시다.
+
+JSX를 JS로 변환하면 `createElement`를 호출하는 것을 볼 수 있습니다.
+
+```jsx file=./01.jsx
+```
+
+이전 단계에서 보았던 `type`과 `props`를 가진 객체 엘리먼트입니다. 우리가 만들 함수가 하는 일은 객체를 생성하는 것 뿐입니다.
+
+```jsx file=./02.jsx
+```
+
+우리는 `props`에 _스프레드 연산자_(_spread operator_)를 사용하고, `children`에 나머지 _파라미터 구문_(_rest parameter syntax_)을 적용하면, `children`이 항상 배열 형태가 됩니다.
+
+<div>
+
+예를 들어, `createElement("div")`은 다음을 반환합니다.
+
+```json
+{
+  "type": "div",
+  "props": { "children": [] }
+}
+```
+
+`createElement("div", null, a)`의 결과는 다음과 같습니다.
+
+```json
+{
+  "type": "div",
+  "props": { "children": [a] }
+}
+```
+
+그리고 `createElement("div", null, a, b)`의 결과는 다음과 같습니다.
+
+```json
+{
+  "type": "div",
+  "props": { "children": [a, b] }
+}
+```
+
+</div>
+
+```jsx file=./03.jsx
+```
+
+또한 `children` 배열은 string이나 number과 같은 기본 타입의 값들을 포함할 수 있습니다. 따라서 우리는 객체가 아닌 모든 것들을 감싸서 자체 엘리먼트 안에 넣고, 이를 `TEXT_ELEMENT`라는 특별한 타입으로 생성할 수 있습니다.
+
+_실제 리액트에서는 `children`이 아닐 경우엔 기본 타입의 값들을 래핑하거나 빈 배열을 생성하지 않습니다. 하지만 코드를 간결하게 만들고, 우리의 라이브러리의 목적은 성능이 개선된 코드보다는 간단한 코드를 만드는 데 있으므로 그냥 진행하도록 합니다._
+
+```jsx file=./03.jsx  25,28,29,30
+```
+
+아직까지는 계속 리액트의 `createElement`를 사용하고 있는 상태입니다.
+
+이제 이를 교체하기 위해, 우리의 라이브러리에 이름을 부여합니다. 리액트같이 들리지만 _교육적인_(_didactic_) 목적이 드러나는 이름이 필요합니다.
+
+```jsx file=./04.jsx
+```
+
+이제 이를 "디액트(Didact)"라고 부르도록 합시다.
+
+하지만 여기서도 JSX는 계속 사용하고 싶습니다. 어떻게 바벨에게 리액트 대신 우리가 만든 디액트의 `createElement`를 사용하도록 할 수 있을까요?
+
+```jsx file=./05.jsx
+```
+
+코멘트를 위와 같이 추가하면 바벨이 JSX를 트랜스파일 할 때 우리가 정의한 함수를 사용할 수 있게 됩니다.
+
+```jsx file=./05.jsx 37
+```
+
+## Step II: render 함수
+
+다음으로 `ReactDOM.render` 함수를 우리 버전으로 바꿔 봅시다.
+
+```jsx file=./06.jsx 25:27,29,31,32,42
+```
+
+지금까지는 DOM에 어떤 것들을 추가하는 것에만 집중했다면, 이제 갱신과 삭제를 다루어보겠습니다.
+
+```jsx file=./07.jsx 25:29
+```
+
+엘리먼트 타입을 이용하여 DOM 노드를 생성하는 것부터 시작하겠습니다. 그 다음 새롭게 만들어진 노드를 컨테이너에 추가합니다.
+
+```jsx file=./08.jsx 25,28:30,33
+```
+
+이 과정을 각각의 자식들 모두에게 재귀적으로 수행합니다.
+
+```jsx file=./09.jsx
+```
+
+또한 텍스트 엘리먼트도 처리해야 합니다. 만약 타입이 `TEXT_ELEMENT`인 경우, 일반적인 노드 대신 텍스트 노드를 생성하도록 합니다.
+
+```jsx file=./10.jsx
+```
+
+마지막으로 해야 할 것은 노드에 엘리먼트 속성들을 부여하는 것입니다.
+
+```jsx file=./10.jsx 1:58
+```
+
+끝입니다. 이제 JSX를 DOM으로 렌더링 할 수 있는 라이브러리를 만들었습니다.
+
+[codesandbox](https://codesandbox.io/s/didact-2-k6rbj)에서 테스트 할 수 있습니다.
+
+</CodeWave>
+
+## Step III: 동시성 모드 (Concurrent Mode)
+
+다른 코드를 추가하기 전에, 약간 리팩토링이 필요합니다.
+
+<CodeWave>
+
+```jsx file=./10.jsx 25,38:40,43
+```
+
+재귀 호출이 문제입니다.
+
+우리가 렌더링을 시작하면, 모든 엘리먼트 트리를 렌더링 하는 것을 마치기 전까지는 이를 멈출 수 없습니다. 만약 엘리먼트 트리가 크다면 메인 스레드의 동작이 너무 오랫동안 멈출 것입니다. 그리고 브라우저가 유저의 입력이나 애니메이션을 부드럽게 하는 것에 높은 우선순위를 두고 있다면, 이 작업들은 렌더링이 끝나기 전까지 대기해야 합니다.
+
+```jsx file=./11.jsx
+```
+
+따라서 작업을 더 작은 단위로 나눈 다음, 각각의 단위마다 브라우저가 어떤 작업이 필요한 경우 렌더링 도중에 끼어들 수 있도록 할 것입니다.
+
+```jsx file=./11.jsx 47,55,56,58
+```
+
+반복문을 만들기 위해 `requestIdleCallback` 함수를 사용합니다. `requestIdleCallback`은 `setTimeout` 같은 것으로 생각하면 됩니다. 하지만 언제 실행해야 할지를 알려주는 대신, 메인 스레드가 대기 상태일 때 브라우저가 콜백을 실행할 것입니다.
+
+_리액트는 [`requestIdleCallback`을 더 이상 사용하지 않고](https://github.com/facebook/react/issues/11171#issuecomment-417349573) 대신, [scheduler package](https://github.com/facebook/react/tree/master/packages/scheduler)를 사용합니다. 개념적으로는 동일합니다._
+
+```jsx file=./11.jsx 47,48,49,53,54,56
+```
+
+`requestIdleCallback`은 데드라인 매개 변수를 제공합니다. 이를 이용하여 다시 브라우저에서 제어를 가져갈 때까지 얼마나 걸리는지를 체크할 수 있습니다.
+
+<div>	
+
+_2019년 11월 현재, 동시성 모드는 아직 리액트의 안정적인 버전에 포함되지 않았습니다. 안정 버전에서의 반복문은 다음과 같습니다._
+
+```js	
+while (nextUnitOfWork) {	
+  nextUnitOfWork = performUnitOfWork(	
+    nextUnitOfWork	
+  )	
+}	
+```	
+
+</div>
+
+```jsx file=./11.jsx 45,47,50:52,56,60:62
+```
+
+반복문을 시작하려면 첫 번째 작업 단위를 설정해야 합니다. 그리고 그 작업을 수행하는 것 뿐만 아니라 다음 작업 단위를 반환하기 위해 `performUnitOfWork` 함수를 작성합니다.
+
+</CodeWave>
+
+## Step IV: Fibers
+
+작업 단위들을 구조화하기 위해서는 fiber tree라는 자료구조가 필요합니다.
+
+엘리먼트마다 하나의 fiber를 가지며, 각각의 fiber는 하나의 작업 단위가 됩니다.
+
+다음의 예시를 보겠습니다.
+
+<ImageWaveLocal background="#232129">
+
+![Fiber Tree 0](./fiber0.png)
+
+다음과 같이 생긴 트리를 렌더링 하고 싶다고 합시다.
+
+```jsx
+Didact.render(
+  <div>
+    <h1>
+      <p />
+      <a />
+    </h1>
+    <h2 />
+  </div>,
+  container
+)
+```
+
+`render` 함수 내부에 루트 fiber를 생성하고, 이를 `nextUnitOfWork`로 설정합니다. 남은 작업들은 `performUnitOfWork` 함수에서 일어나는데, 각각의 fiber에서는 다음 3가지 작업을 합니다.
+
+1. DOM에 엘리먼트를 추가하기
+2. 각 엘리먼트의 children에 대해 fiber를 생성하기
+3. 다음 작업 단위를 선택하기
+
+![Fiber Tree 1](./fiber1.png)
+
+이 자료구조의 목적 중 하나는 다음에 필요한 작업 단위를 찾기 쉽도록 하는 것입니다. 그래서 각각의 fiber는 첫 번째 자식(`child`)과 형제자매(`sibling`), 부모(`parent`)의 링크를 가집니다.
+
+![Fiber Tree 2](./fiber2.png)
+
+만약 어떤 fiber에서 작업 수행을 끝마쳤을 때, fiber에게 자식이 있다면 그곳이 다음 작업 단위가 됩니다.
+
+우리 예시에서는, `div` fiber에서의 작업이 끝난 후 다음 작업 단위는 `h1` fiber가 됩니다.
+
+![Fiber Tree 3](./fiber3.png)
+
+만약 fiber에 자식이 없다면 형제자매가 다음 작업의 대상이 됩니다.
+
+가령, `p` fiber는 자식이 없으므로 이를 끝마치고 나면 `a` fiber로 옮겨가게 됩니다.
+
+![Fiber Tree 4](./fiber4.png)
+
+만약 어떤 fiber가 자식도, 형제자매도 없다면 부모의 형제자매 fiber로 이동합니다. 예를 들면 `a`와 `h2`처럼요.
+
+또한 만약 부모에게 형제자매가 없다면, 형제자매가 있는 조상을 찾거나 루트에 도착할 때까지 계속 거슬러 올라갑니다. 만약 루트에 도달했다면 이는 렌더링 작업 수행이 모두 끝났음을 의미합니다.
+
+</ImageWaveLocal>
+
+이제 이를 코드에 채워봅시다.
+
+<CodeWave>
+
+```jsx file=./11.jsx 25:45
+```
+
+먼저, `render` 함수에서 이 코드를 제거합니다.
+
+```jsx file=./12.jsx 25,39,41:45
+```
+
+자체 함수 내부에서 DOM 노드를 생성하는 부분은 그대로 유지할 것입니다. 이는 나중에 사용합니다.
+
+```jsx file=./13.jsx 41:50
+```
+
+`render` 함수에서 fiber 트리의 루트에 `nextUnitOfWork` 함수를 설정합니다.
+
+```jsx file=./13.jsx 52,55:57,61,65:69
+```
+
+그 다음, 준비를 마친 브라우저가 우리가 만든 `workLoop`를 호출하면, 루트에서부터 작업을 시작합니다.
+
+```jsx file=./14.jsx
+```
+
+먼저 새로운 노드를 생성하고 DOM에 이를 추가합니다.
+
+계속해서 `fiber.dom` 속성 내부의 DOM 노드를 추적합니다.
+
+```jsx file=./15.jsx
+```
+
+각각의 자식들마다 새로운 fiber를 생성합니다.
+
+```jsx file=./16.jsx
+```
+
+그리고 이들을 첫 번째 자식인지 아닌지에 따라 자식 혹은 형제자매로서 fiber 트리에 추가합니다.
+
+```jsx file=./17.jsx
+```
+
+마지막으로 다음 작업은 탐색입니다.
+탐색은 먼저 자식, 형제자매, 부모의 형제자매 순서로 진행됩니다.
+
+```jsx file=./17.jsx 65:108
+```
+
+이제 `performUnitOfWork` 작업이 끝났습니다.
+
+```jsx file=./17.jsx 65,70:72
+```
+
+## Step V: 렌더와 커밋 단계 (Render and Commit Phases)
+
+아직 문제 하나가 더 남아있습니다.
+
+엘리먼트에서 작업을 수행할 때 마다 각각의 DOM에 새로운 노드를 추가하고 있습니다.
+그리고 브라우저가 렌더링이 진행되고 있는 중간에 난입할 수 있다는 것을 기억해야 합니다.
+이 경우 유저는 미완성된 UI를 보게 됩니다. 물론 이렇게 되지 않도록 해야 합니다.
+
+```jsx file=./18.jsx 65,72[1]
+```
+
+이를 위해 여기서 DOM을 변형시키는 부분을 제거합니다.
+
+```jsx file=./18.1.jsx
+```
+
+그 대신, fiber 트리의 루트를 추적할 것입니다. 이를 작업 중인(work in progress) 루트라는 뜻으로 `wipRoot`라고 하겠습니다.
+
+```jsx file=./19.jsx 41:43,58,67:69,72
+```
+
+일단 모든 작업이 끝나고 나면 (더 이상 다음 작업이 없는 경우), 전체 fiber 트리를 DOM에 커밋합니다.
+
+```jsx file=./20.jsx 41:54
+```
+
+이 과정은 `commitRoot` 함수에서 이루어집니다. 여기서 모든 노드를 재귀적으로 DOM에 추가합니다.
+
+## Step VI: 재조정(Reconciliation)
+
+이제까지 우리는 DOM에 요소들을 _넣는_ 작업을 했습니다. 그럼 노드를 갱신과 삭제하는 것은 어떻게 된 걸까요?
+
+다음에 할 것이 바로 그 부분입니다. 우리가 `render` 함수로 얻은 엘리먼트들을 마지막으로 커밋한 fiber 트리와 비교해야 합니다.
+
+```jsx file=./21.jsx 41,43,45,57,58,63,64,66,69
+```
+
+따라서 커밋이 끝난 다음에는 "마지막으로 DOM에 커밋된 fiber 트리"를 저장할 필요가 있습니다. 이를 `currentRoot`라고 합시다.
+
+또한 모든 fiber에 `alternate`라는 속성을 추가해야 합니다. 이 속성은 이전의 커밋 단계에서 DOM에 추가했던 오래된 fiber에 대한 링크입니다.
+
+```jsx file=./21.jsx 90:129
+```
+
+이제 새로운 fiber를 생성하는 코드를 `performUnitOfWork`에서 추출해서,
+
+```jsx file=./22.jsx 90,95,96,108,110,114[1]
+```
+
+새로 `reconcileChildren` 함수를 만듭니다.
+
+```jsx file=./22.jsx 110,133
+```
+
+이제 이곳에서 오래된 fiber를 새로운 엘리먼트로 재조정(reconcile) 할 것입니다.
+
+```jsx file=./23.jsx 110:113,116:120,123
+```
+
+오래된 fiber(`wipFiber.alternate`)의 자식들(`children`)과 재조정하기를 원하는 엘리먼트의 배열을 동시에 순회합니다.
+
+만약 배열과 링크드 리스트를 동시에 반복하는 데 필요한 이 모든 보일러플레이트를 신경쓰지 않는다면, while문 안에는 `oldFiber`와 `element`라는 가장 중요한 부분만 남습니다. **`element`는 우리가 DOM 안에 렌더링하고 싶은 것이며, `oldFiber`는 가장 마지막으로 렌더링 했던 것입니다.**
+
+이를 DOM에 적용하기 위해서는 둘 사이에 어떤 차이가 생겼는지 비교해야 합니다.
+
+```jsx file=./24.jsx
+```
+
+이러한 비교를 위해서 타입을 사용합니다.
+
+- 만약 오래된 fiber와 새로운 엘리먼트가 같은 타입이라면, DOM 노드를 유지하고 새로운 props만 업데이트 합니다.
+
+- 만약 서로 타입이 다르고 새로운 엘리먼트가 존재한다면, 이는 새로운 DOM 노드 생성이 필요하다는 뜻입니다.
+
+- 그리고 만약 타입이 다르고 오래된 fiber가 존재한다면, 오래된 노드를 제거해야 합니다.
+
+_Here React also uses keys, that makes a better reconciliation. For example, it detects when `children` change places in the element array._
+
+_여기서 리액트는 더 나은 재조정을 하기 위해 키(key)들을 사용합니다. 예를 들면, 키를 사용하여 엘리먼트 배열의 자식이 변하는 지점을 감지합니다.._
+
+```jsx file=./25.jsx 123:137
+```
+
+오래된 fiber와 엘리먼트가 같은 타입을 가질 때, 오래된 fiber와 엘리먼트의 props에서 새로운 fiber를 생성하고 DOM 노드를 유지합니다.
+
+또한 fiber에 `effectTag` 라는 새로운 속성을 추가합니다. 이 속성은 나중에 커밋 단계에서 사용하게 됩니다.
+
+```jsx file=./26.jsx 138:147
+```
+
+그리고 새로운 DOM 노드가 필요한 경우, 새로운 fiber에 `PLACEMENT`라는 effect tag를 붙입니다.
+
+```jsx file=./27.jsx 148:151
+```
+
+노드를 삭제해야 하는 경우에는 새로운 fiber가 필요하지 않으며, 오래된 fiber에 `DELETION` 태그를 추가합니다.
+
+하지만 fiber 트리를 DOM에 커밋할 때, 작업 중인 루트(work in progress root)에는 오래된 fiber가 없습니다.
+
+```jsx file=./28.jsx 57,65,67,72
+```
+
+따라서 제거하고 싶은 노드를 추적하기 위한 배열(deletions)이 필요합니다.
+
+```jsx file=./29.jsx 41,42,46
+```
+
+그러면 DOM에 변경사항을 커밋할 때 이 배열에 있는 fiber를 사용할 수 있습니다.
+
+```jsx file=./29.jsx 48:56
+```
+
+이제 새로운 `effectTags`를 처리하기 위해 `commitWork` 함수를 변경해 보겠습니다.
+
+```jsx file=./30.jsx
+```
+
+만약 fiber가 `PLACEMENT` 태그를 가진다면 이전에 했던 것과 동일하게 부모 fiber 노드에 자식 DOM 노드를 추가합니다.
+
+```jsx file=./31.jsx
+```
+
+`DELETION` 태그는 반대로 자식을 부모 DOM에서 제거합니다.
+
+```jsx file=./32.jsx
+```
+
+갱신(`UPDATE`)의 경우, 이미 존재하는 DOM 노드를 변경된 props를 이용하여 갱신합니다.
+
+```jsx file=./33.jsx
+```
+
+이 작업은 `updateDom` 이라는 함수에서 수행할 것입니다.
+
+```jsx file=./34.jsx 36:56
+```
+
+오래된 fiber의 props들을 새로운 fiber의 props와 비교하여, 사라진 props는 제거하고, 새롭거나 변경된 props를 설정합니다.
+
+```jsx file=./35.jsx
+```
+
+갱신을 위해 사용하는 특별한 종류의 속성이 있는데 바로 이벤트 리스너입니다. 따라서 만약 속성의 이름이 "on" 이라는 접두사로 시작한다면 이를 다르게 처리해줘야 합니다.
+
+```jsx file=./36.jsx
+```
+
+만약 이벤트 핸들러가 바뀐다면, 이를 노트에서 제거합니다.
+
+```jsx file=./37.jsx
+```
+
+그 다음 새로운 핸들러를 추가합니다.
+
+</CodeWave>
+
+재조정이 적용된 버전의 코드를 [여기](https://codesandbox.io/s/didact-6-96533)에서 확인할 수 있습니다.
+
+<CodeWave>
+
+```jsx file=./38.jsx 245:251
+```
+
+## Step VII: 함수형 컴포넌트 (Function Components)
+
+그 다음 해야 할 것은 함수형 컴포넌트 지원을 추가하는 것입니다.
+
+먼저 예제를 `h1` 엘리먼트를 반환하는 간단한 함수형 컴포넌트를 사용하는 것으로 바꿔보겠습니다.
+
+만약 JSX를 JS로 변환하면 다음과 같습니다.
+
+<div>
+
+```js
+function App(props) {
+  return Didact.createElement(
+    "h1",
+    null,
+    "Hi ",
+    props.name
+  )
+}
+const element = Didact.createElement(App, {
+  name: "foo",
+})
+```
+
+</div>
+
+```jsx file=./38.jsx 162:168
+```
+
+함수형 컴포넌트는 다음 두 가지 면에서 차이가 있습니다.
+
+- 함수형 컴포넌트에서 만들어진 fiber는 DOM 노드가 없습니다.
+- 자식들(`children`)을 `props`에서 직접 가져오는 대신 함수를 실행하여 얻습니다.
+
+```jsx file=./41.jsx
+```
+
+fiber 타입이 함수인지 체크한 다음 그 결과에 따라 따라 다양한 갱신 함수로 이동합니다.
+
+`updateHostComponent` 에서는 이전과 동일한 일을 합니다.
+
+```jsx file=./42.jsx
+```
+
+그리고 `updateFunctionComponent` 에서는 자식 요소를 얻는 함수를 실행합니다.
+
+가령, 여기서 `fiber.type`은 `App` 함수이고, 이를 실행하면 `h1` 엘리먼트를 반환합니다.
+
+그 다음 자식을 얻게 되면, 재조정 작업은 같은 방법으로 수행되므로 더 이상 코드를 바꿀 필요는 없습니다.
+
+```jsx file=./42.jsx 99:125
+```
+
+그 다음 변경이 필요한 것은 `commitWork` 함수입니다.
+
+지금 우리는 DOM 노드가 없는 fiber를 가지고 있기 때문에 두 가지를 바꿔야 합니다.
+
+```jsx file=./43.jsx 104:108,114
+```
+
+먼저, DOM 노드의 부모를 찾으려면 DOM 노드를 가진 fiber를 찾을 때까지 fiber 트리의 상단으로 올라갑니다.
+
+```jsx file=./44.jsx
+```
+
+그리고 노드를 제거할 때도 동일하게, DOM 노드를 가진 자식을 찾을 때까지 탐색을 수행합니다.
+
+```jsx file=./44.jsx 270:276
+```
+
+## Step VIII: 훅 (Hooks)
+
+마지막 단계입니다. 이제 함수형 컴포넌트에 상태를 추가해 봅시다.
+
+```jsx file=./45.jsx
+```
+
+예제를 고전적인 카운터 컴포넌트로 바꿔 보겠습니다. 우리가 카운터를 클릭할 때마다, state를 1씩 추가하게 됩니다.
+
+여기서 우리는 `Didact.useState`를 사용해서 카운터의 값을 얻거나 갱신합니다.
+
+```jsx file=./46.jsx 195,196,198:202
+```
+
+이곳이 예제에서 `Counter` 함수를 호출하는 부분입니다. 그리고 그 함수 내부에서 `useState`를 호출합니다.
+
+```jsx file=./47.jsx 195:201,202[21:43],204
+```
+
+함수형 컴포넌트를 호출하기 전에 `useState` 함수의 내부에서 사용하기 위한 몇몇 전역 변수들을 초기화해야 합니다.
+
+먼저 작업 중인 fiber를 설정합니다.
+
+또한 그 fiber에 `hooks` 배열을 추가함으로서 동일한 컴포넌트에서 여러 번 `useState` 함수를 호출 할 수 있도록 합니다.
+
+```jsx file=./48.jsx 206:218
+```
+
+함수형 컴포넌트가 `useState`를 호출할 때 이것이 오래된 hook인지를 체크하는데, 이때 훅 인덱스를 사용하여 fiber의 `alternate`를 체크합니다.
+
+만약 우리가 가지고 있는 것이 오래된 hook이라면 상태를 초기화하지 않았을 경우 이 훅의 상태를 새로운 훅으로 복사합니다.
+
+그리고 새로운 훅을 fiber에 추가한 뒤 훅 인덱스 값을 증가시킨 다음 state를 반환합니다.
+
+```jsx file=./49.jsx 211,213:225,229
+```
+
+또한 `useState`는 상태를 갱신하는 함수 역시 리턴해야 하므로, 액션을 받는 `setState` 함수를 정의합니다. (`Counter` 예제의 경우, 액션은 상태를 1 증가시키는 동작입니다)
+
+이 액션을 우리가 훅에 추가한 큐에 넣습니다.
+
+And then we do something similar to what we did in the `render` function, set a new work in progress root as the next unit of work so the work loop can start a new render phase.
+
+그리고 `render` 함수에서 했던 것과 비슷한 작업을 하는데, 새로운 작업 중(wip)인 루트를 다음 작업할 단위로 설정하여 반복문에서 새로운 렌더 단계를 시작할 수 있도록 합니다.
+
+```jsx file=./50.jsx
+```
+
+아직 액션을 실행하지는 않았습니다.
+
+이는 컴포넌트 렌더링 다음에 수행하는데, 오래된 훅의 큐에서 모든 액션을 가져온 다음 이를 새로운 훅 state에 하나씩 적용하면 갱신된 state를 얻을 수 있게 됩니다.
+
+```jsx file=./50.jsx 1:319
+```
+
+자 이제 끝났습니다. 우리는 직접 나만의 버전으로 리액트를 만들어보았습니다. 
+
+이를 [codesandbox](https://codesandbox.io/s/didact-8-21ost) 혹은 [github](https://github.com/pomber/didact)에서 실행해볼 수 있습니다.
+
+</CodeWave>
+
+## 에필로그
+
+이 포스트의 목적은 리액트가 어떻게 동작하는지 알기 쉽도록 돕는 것 외에도, 리액트 코드베이스를 깊이 탐구하기 용이하게 하려는 의도도 있습니다. 그렇기에 거의 대부분 동일한 변수와 함수명을 사용한 것입니다.
+
+가령, 실제 리액트 앱에서 함수형 컴포넌트에 중단점을 추가한다고 했을 때, 콜 스택은 다음을 표시합니다:
+
+- `workLoop`
+- `performUnitOfWork`
+- `updateFunctionComponent`
+
+또한 리액트의 모든 기능들과 최적화 요소들이 포함되지는 않았습니다. 가령, 다음은 리액트와는 다르게 동작하는 것들입니다
+
+- 디액트에서는 렌더 단계의 모든 트리를 순회하지만 실제 리액트는 대신 특정한 힌트만을 따라가며 변하지 않은 서브 트리는 휴리스틱하게 뛰어넘습니다.
+- 디액트는 커밋 단계에서도 모든 트리를 순회합니다. 하지만 리액트는 영향이 가는 fiber들의 연결 리스트를 유지하여 해당 fiber만 방문합니다.
+- 작업 중(wip)인 트리를 생성할 때마다 우리는 각 fiber에 새로운 객체를 생성했지만, 리액트는 이전의 트리에서 가져온 fiber를 재사용합니다.
+- 디액트는 렌더 단계에서 새로운 갱신을 얻을 때 작업 중(wip)인 트리를 버리고 루트에서부터 새로 시작하지만, 리액트는 각 갱신의 만료 타임스탬프를 표시해두고, 갱신 시 이를 높은 우선순위로 참고하여 결정합니다.
+- 그 외에도 많은 것들이 다릅니다.
