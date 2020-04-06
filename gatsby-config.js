@@ -17,6 +17,7 @@ module.exports = {
         "I am a developer dad with a son who dreams of a developer.\nI'm interested in data visualization and enjoy creating fun programs.",
       ],
     ],
+    siteUrl: `https://bluewings.github.io/`,
     social: [
       {
         name: 'GitHub',
@@ -44,6 +45,7 @@ module.exports = {
         trackingId: 'UA-87089021-5',
       },
     },
+    'gatsby-plugin-sitemap',
     // {
     //   resolve: 'gatsby-plugin-manifest',
     //   options: {
