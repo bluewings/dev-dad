@@ -1,0 +1,78 @@
+// .root {
+//   background: #A3ED09;
+//   padding: 10px;
+// }
+
+$duration: 0.5s;
+
+.animate {
+  transition: all $duration;
+
+  .bar {
+
+    path,
+    text {
+      transition: all $duration linear;
+      font-family: 'Source Sans Pro';
+    }
+
+  }
+}
+
+
+
+// .root {
+//   transition: all $duration;
+
+//   .label {
+//     .country {
+//       font-family: 'Gothic A1', sans-serif;
+//     }
+//   }
+
+//   .bar {
+//     // path {
+
+//     // transition: d $duration;
+//     // }
+
+//     .count {
+
+
+//       font-family: 'Source Sans Pro',
+//         sans-serif;
+//     }
+//   }
+
+
+//   // path {
+//   //   transition: all $duration;
+//   // }
+
+//   // text {
+//   //   transition: all $duration;
+//   //   // font-family: 'Gothic A1', sans-serif;
+//   //   font-family: 'Source Code Pro', 'Montserrat', 'Gothic A1', sans-serif;
+
+//   //   font-family: 'Gothic A1', sans-serif;
+//   //   font-family: 'Montserrat', sans-serif;
+//   //   font-family: 'Source Code Pro', monospace;
+//   //   font-family: 'Source Sans Pro', monospace;
+//   //   // font-family: 'Anonymous Pro', monospace;
+//   //   // font-family: 'Share Tech Mono', monospace;
+//   //   // font-family: 'Space Mono', monospace;
+//   //   // font-family: 'Major Mono Display', monospace;
+//   //   font-family: 'Source Sans Pro', sans-serif;
+//   //   // font-size: 14px;
+
+//   // }
+
+//   // p {
+
+//   // }
+
+//   // animation-name: diamondFillMode;
+//   // animation-duration: 4s;
+//   // animation-iteration-count: 1;
+//   // animation-fill-mode: forwards;
+// }

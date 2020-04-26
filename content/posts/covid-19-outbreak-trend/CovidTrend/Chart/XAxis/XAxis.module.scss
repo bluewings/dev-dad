@@ -1,0 +1,17 @@
+.tick {
+  g {
+    transform: all 0.5s linear;
+
+    text {
+      font-family: 'Source Sans Pro';
+      text-anchor: middle;
+      alignment-baseline: middle;
+    }
+
+    line {
+      stroke: #aaa;
+      stroke-dasharray: 5;
+    }
+  }
+
+}
