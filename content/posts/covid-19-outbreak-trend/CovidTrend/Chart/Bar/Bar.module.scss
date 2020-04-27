@@ -12,7 +12,7 @@ $duration: 0.5s;
 
     path,
     text {
-      transition: all $duration linear;
+      transition: all $duration;
       font-family: 'Source Sans Pro';
     }
 

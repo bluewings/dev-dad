@@ -102,9 +102,11 @@ function Bar({
     <g
       ref={rootRef}
       className={styles.root}
-      transform={`translate(0, ${rank * height})`}
+      style={{ transform: `translateY(${rank * height}px)` }}
     >
-      <g className={styles.bar} transform={`translate(${barLeft}, ${barTop})`}>
+      <g className={styles.bar} 
+      style={{ transform: `translate(${barLeft}px, ${barTop}px)` }}
+      >
         {/* <!-- bar --> */}
         <path
           d={`M0 0 l${barWidth} 0 l0 ${BAR_HEIGHT} l${barWidth * -1} 0 Z`}
@@ -112,17 +114,20 @@ function Bar({
           fill={fillColor}
         />
         {/* <!-- count --> */}
+        <g style={{ transform: `translateX(${barWidth}px)` }}>
         <text
           ref={textRef}
           className={styles.count}
-          transform={`translate(${barWidth}, 0)`}
+          
           x={textAnchor === 'end' ? -PADDING: PADDING}
           y={baseline - barTop}
           fontSize={FONT_SIZE}
           textAnchor={textAnchor}
           alignmentBaseline="middle"
           fill={strokeColor}
+          
         />
+        </g>
       </g>
       <g className={styles.label}>
         {/* <!-- country --> */}
