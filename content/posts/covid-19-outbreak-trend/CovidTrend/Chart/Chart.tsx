@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Fragment } from 'react';
 import { useMeasure } from 'react-use';
+import { useColorMode } from 'theme-ui';
 import styles from './Chart.module.scss';
 import XAxis from './XAxis';
 import Bar from './Bar';
@@ -20,30 +21,6 @@ const INTERVAL = 1000;
 
 // const height = 30;
 
-const steps = [
-  {
-    iso2: 'US',
-    country: '사우디아라비아',
-    rank: 1,
-    count: 3412,
-    maxCount: 5000,
-  },
-  {
-    iso2: 'US',
-    country: '사우디아라비아',
-    rank: 2,
-    count: 8000,
-    maxCount: 15000,
-  },
-  {
-    iso2: 'US',
-    country: '사우디아라비아',
-    rank: 3,
-    count: 30432,
-    maxCount: 50000,
-  },
-];
-
 const countryWidth = 120;
 const height = 30;
 const flagSize = height * 1.1;
@@ -56,15 +33,12 @@ const BREAKPOINT = 600;
  * Component Description
  */
 function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartProps) {
-  const [
-    ref,
-    { x, y, width: viewBoxWidth, top, right, bottom, left },
-  ] = useMeasure();
-
+  const [ref, { x, y, width: viewBoxWidth, top, right, bottom, left }] = useMeasure();
+  const [colorMode] = useColorMode();
 
   const label = useMemo(() => {
-    return _label ? _label : viewBoxWidth < BREAKPOINT && 'flag'
-  }, [_label,viewBoxWidth ])
+    return _label ? _label : viewBoxWidth < BREAKPOINT && 'flag';
+  }, [_label, viewBoxWidth]);
 
   // const
 
@@ -72,10 +46,10 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
 
   // const { label, countries } = props;
 
-  const [index, setIndex] = useState(0);
-  const item = useMemo(() => {
-    return steps[index % steps.length];
-  }, [index]);
+  // const [index, setIndex] = useState(0);
+  // const item = useMemo(() => {
+  //   return steps[index % steps.length];
+  // }, [index]);
 
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -86,10 +60,7 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
   //   };
   // }, [index, setIndex]);
 
-  const [labelFlag, labelCountry] = useMemo(
-    () => [label === 'flag' || !label, label === 'name' || !label],
-    [label],
-  );
+  const [labelFlag, labelCountry] = useMemo(() => [label === 'flag' || !label, label === 'name' || !label], [label]);
 
   const barLeft = useMemo(
     () =>
@@ -101,8 +72,7 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
   );
 
   const barMaxWidth = useMemo(
-    () => viewBoxWidth - barLeft 
-    -  ( viewBoxWidth < BREAKPOINT ? 1 : countMaxWidth + padding * 2) ,
+    () => Math.max(viewBoxWidth - barLeft - (viewBoxWidth < BREAKPOINT ? 1 : countMaxWidth + padding * 2), 0),
     [viewBoxWidth, barLeft, BREAKPOINT],
   );
 
@@ -110,10 +80,7 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
 
   const [maxCount, totalCount] = useMemo(() => {
     const counts = countries.map(({ count }: any) => count);
-    return [
-      Math.max(...counts),
-      counts.reduce((prev: number = 0, curr: number) => prev + curr),
-    ];
+    return [Math.max(...counts), counts.reduce((prev: number = 0, curr: number) => prev + curr)];
   }, [countries]);
 
   const [_countries, setCountries] = useState(countries);
@@ -127,9 +94,9 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
         };
       }, {});
 
-      let abc = [..._countries].slice(0, 30).map(e => ({...e,rank: -1}))
+      let abc = [..._countries].slice(0, 40).map((e) => ({ ...e, rank: -1 }));
 
-      countries.slice(0,30).forEach((e: any, i: number) => {
+      countries.slice(0, 40).forEach((e: any, i: number) => {
         const found = dict[e.country];
         if (found) {
           abc[found.index] = e;
@@ -137,62 +104,97 @@ function Chart({ date, label: _label, countries, interval = INTERVAL }: IChartPr
           abc.push(e);
         }
       });
-      abc = abc.filter(e => e.rank !== -1)
+      abc = abc.filter((e) => e.rank !== -1);
 
-      
       if (JSON.stringify(_countries) !== JSON.stringify(abc)) {
         setCountries(abc);
       }
     }
   }, [_countries, countries, setCountries]);
 
-  const viewBoxHeight = 360;
+  const topTenHeight = height * 11;
+  const viewBoxHeight = topTenHeight + height * 1.5;
 
   const showCountries = useMemo(() => {
-    return _countries.filter(e => e.rank < 20);
-  }, [_countries])
+    return _countries.filter((e) => e.rank < 20 && e.iso2 !== 'KR');
+  }, [_countries]);
+
+  const countryKR = useMemo(() => {
+    return _countries.find((e) => e.iso2 === 'KR');
+  }, [_countries]);
 
   return (
     <div className={styles.root} ref={ref}>
-      <svg
-        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-        // style={{ border: '1px solid blue' }}
-      >
+      <svg viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}>
         <XAxis
+          colorMode={colorMode}
           barLeft={barLeft}
           barMaxWidth={barMaxWidth}
           maxCount={maxCount}
           interval={interval}
           height={height}
-          viewBoxHeight={viewBoxHeight}
+          viewBoxHeight={topTenHeight}
         />
-        {showCountries.map(({ rank, country, count, iso2 }: any) => {
-          return (
+        <clipPath id="clippath">
+          <rect x={0} y={0} width={viewBoxWidth} height={topTenHeight} />
+        </clipPath>
+        <g clipPath="url(#clippath)">
+          {showCountries.map(({ rank, country, count, iso2 }: any) => {
+            return (
+              <Bar
+                colorMode={colorMode}
+                key={country}
+                labelFlag={labelFlag}
+                labelCountry={labelCountry}
+                barLeft={barLeft}
+                barMaxWidth={barMaxWidth}
+                maxCount={maxCount}
+                rank={rank}
+                country={country}
+                count={count}
+                iso2={iso2}
+                // {...e}
+                interval={interval}
+                height={height}
+                textAnchor={rank === 1 && viewBoxWidth < BREAKPOINT ? 'end' : 'start'}
+              />
+            );
+          })}
+        </g>
+        {countryKR && (
+          <Fragment key={countryKR.country}>
+            {countryKR.rank > 11 && (
+              <line
+                x1="0"
+                y1={topTenHeight + height / 4}
+                x2={viewBoxWidth}
+                y2={topTenHeight + height / 4}
+                stroke="#000"
+              />
+            )}
             <Bar
-              key={country}
+              colorMode={colorMode}
               labelFlag={labelFlag}
               labelCountry={labelCountry}
               barLeft={barLeft}
               barMaxWidth={barMaxWidth}
               maxCount={maxCount}
-              rank={rank}
-              country={country}
-              count={count}
-              iso2={iso2}
+              {...countryKR}
+              rank={Math.min(countryKR.rank, 11.5)}
               // {...e}
               interval={interval}
               height={height}
-              textAnchor={rank === 1 && viewBoxWidth < BREAKPOINT ? "end": "start"}
+              textAnchor={countryKR.rank === 1 && viewBoxWidth < BREAKPOINT ? 'end' : 'start'}
             />
-          );
-        })}
-
+          </Fragment>
+        )}
         <Summary
+          colorMode={colorMode}
           date={date}
           totalCount={totalCount}
           interval={interval}
           viewBoxWidth={viewBoxWidth}
-          viewBoxHeight={viewBoxHeight}
+          viewBoxHeight={topTenHeight}
         />
       </svg>
     </div>

@@ -3,23 +3,20 @@
 //   padding: 10px;
 // }
 
-$duration: 0.5s;
+$duration: 1s;
 
 .animate {
   transition: all $duration;
 
   .bar {
-
-    path,
-    text {
+    rect,
+    text,
+    g {
       transition: all $duration;
       font-family: 'Source Sans Pro';
     }
-
   }
 }
-
-
 
 // .root {
 //   transition: all $duration;
@@ -38,12 +35,10 @@ $duration: 0.5s;
 
 //     .count {
 
-
 //       font-family: 'Source Sans Pro',
 //         sans-serif;
 //     }
 //   }
-
 
 //   // path {
 //   //   transition: all $duration;

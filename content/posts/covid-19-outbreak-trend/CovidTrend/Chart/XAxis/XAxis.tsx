@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { scaleLinear } from 'd3-scale';
 import styles from './XAxis.module.scss';
+import cx from 'classnames';
 
 interface IXAxisProps {
   /**
    * Prop Description
    */
+  colorMode: string;
   message?: string;
   barLeft: number;
   barMaxWidth: number;
@@ -52,14 +54,7 @@ const getGap = (maxHeight: number) => {
 /**
  * Component Description
  */
-function XAxis({
-  barLeft,
-  barMaxWidth,
-  maxCount,
-  interval,
-  height,
-  viewBoxHeight,
-}: IXAxisProps) {
+function XAxis({ colorMode, barLeft, barMaxWidth, maxCount, interval, height, viewBoxHeight }: IXAxisProps) {
   const ticks = getGap(maxCount);
 
   const countRef = useRef<number>(0);
@@ -72,10 +67,7 @@ function XAxis({
 
     const from = new Date().valueOf();
     const to = from + interval;
-    const scaled = scaleLinear()
-      .domain([from, to])
-      .range([countRef.current, maxCount])
-      .clamp(true);
+    const scaled = scaleLinear().domain([from, to]).range([countRef.current, maxCount]).clamp(true);
 
     let raf: number;
     let timer: any;
@@ -96,9 +88,8 @@ function XAxis({
           .map(([e, f], i) => {
             // if (e) {
             return `
-            <g transform="translate(${f}, 0)">
+            <g transform="translate(${f || 0}, 0)">
             <text
-            
             y="${baseline}"
             >
             ${Number(e).toLocaleString()}</text>
@@ -139,7 +130,7 @@ function XAxis({
 
   return (
     <g>
-      <g className={styles.tick} transform={`translate(${barLeft}, 0)`}>
+      <g className={cx(styles.tick, colorMode === 'dark' && styles.dark)} transform={`translate(${barLeft}, 0)`}>
         <g ref={tck} />
       </g>
     </g>

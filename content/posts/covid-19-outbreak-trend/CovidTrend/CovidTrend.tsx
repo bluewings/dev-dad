@@ -23,32 +23,32 @@ interface ITimeSeriesProps {
 // rank: 1,
 // count: 3412,
 // maxCount: 5000,
-const countries3 = timeSeries[65].countries.map(([iso2, country, count], i) => {
-  return {
-    iso2,
-    country,
-    count,
-    rank: i + 1,
-  };
-});
+// const countries3 = timeSeries[65].countries.map(([iso2, country, count], i) => {
+//   return {
+//     iso2,
+//     country,
+//     count,
+//     rank: i + 1,
+//   };
+// });
 
-const countries2 = timeSeries[64].countries.map(([iso2, country, count], i) => {
-  return {
-    iso2,
-    country,
-    count,
-    rank: i + 1,
-  };
-});
+// const countries2 = timeSeries[64].countries.map(([iso2, country, count], i) => {
+//   return {
+//     iso2,
+//     country,
+//     count,
+//     rank: i + 1,
+//   };
+// });
 
-const countries = timeSeries[63].countries.map(([iso2, country, count], i) => {
-  return {
-    iso2,
-    country,
-    count,
-    rank: i + 1,
-  };
-});
+// const countries = timeSeries[63].countries.map(([iso2, country, count], i) => {
+//   return {
+//     iso2,
+//     country,
+//     count,
+//     rank: i + 1,
+//   };
+// });
 
 const _t = timeSeries.map((e) => {
   return {
@@ -91,11 +91,7 @@ function TimeSeries(props: ITimeSeriesProps) {
       <div style={{ width: '75%' }}>
         <Chart label="name" />
       </div> */}
-      <Chart
-        date={item.isoDate}
-        countries={item.countries}
-        interval={INTERVAL}
-      />
+      <Chart date={item.isoDate} countries={item.countries} interval={INTERVAL} />
       {/* <pre>{JSON.stringify(items, null, 2)}</pre> */}
     </div>
   );

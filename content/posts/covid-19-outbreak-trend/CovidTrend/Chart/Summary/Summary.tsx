@@ -2,11 +2,13 @@ import React, { useMemo, useRef, useEffect } from 'react';
 import { scaleLinear } from 'd3-scale';
 import { format } from 'date-fns';
 import styles from './Summary.module.scss';
+import cx from 'classnames';
 
 interface ISummaryProps {
   /**
    * Prop Description
    */
+  colorMode: string;
   date: string;
 
   totalCount: number;
@@ -20,13 +22,7 @@ const fontSize = 48;
 /**
  * Component Description
  */
-function Summary({
-  date,
-  totalCount: count,
-  interval,
-  viewBoxWidth,
-  viewBoxHeight,
-}: ISummaryProps) {
+function Summary({ colorMode, date, totalCount: count, interval, viewBoxWidth, viewBoxHeight }: ISummaryProps) {
   const textRef = useRef<any>();
   const countRef = useRef<number>(0);
   const totalRef = useRef<any>();
@@ -34,10 +30,7 @@ function Summary({
   useEffect(() => {
     const from = new Date().valueOf();
     const to = from + interval;
-    const scaled = scaleLinear()
-      .domain([from, to])
-      .range([countRef.current, count])
-      .clamp(true);
+    const scaled = scaleLinear().domain([from, to]).range([countRef.current, count]).clamp(true);
 
     let raf: number;
     const updateCount = () => {
@@ -58,10 +51,7 @@ function Summary({
             // const _dist = dist;
             dist += fontSize * (e === ',' ? 0.25 : 0.67);
             return `<text x=${
-              viewBoxWidth -
-              dist -
-              (e === ',' ? fontSize * 0.25 : 0) +
-              fontSize / 2
+              viewBoxWidth - dist - (e === ',' ? fontSize * 0.25 : 0) + fontSize / 2
             } font-size=${fontSize}>${e}</text>`;
           })
           .reverse()
@@ -85,12 +75,8 @@ function Summary({
   }, [date]);
 
   return (
-    <g className={styles.root}>
-      <g
-        ref={totalRef}
-        className={styles.totalCount}
-        transform={`translate(-8, ${viewBoxHeight - 8})`}
-      />
+    <g className={cx(styles.root, colorMode === 'dark' && styles.dark)}>
+      <g ref={totalRef} className={styles.totalCount} transform={`translate(-8, ${viewBoxHeight - 8})`} />
       <text
         ref={textRef}
         // className={styles.count}

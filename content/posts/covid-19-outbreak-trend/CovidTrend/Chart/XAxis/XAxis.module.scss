@@ -13,5 +13,9 @@
       stroke-dasharray: 5;
     }
   }
-
+  &.dark {
+    text {
+      fill: #ddd;
+    }
+  }
 }

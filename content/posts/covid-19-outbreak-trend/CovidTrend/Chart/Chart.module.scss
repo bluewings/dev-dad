@@ -4,6 +4,15 @@
 
 @import url('https://fonts.googleapis.com/css?family=Anonymous+Pro|Gothic+A1|Major+Mono+Display|Montserrat|Share+Tech+Mono|Source+Code+Pro|Source+Sans+Pro|Space+Mono&display=swap');
 
+.root {
+  svg {
+    line {
+      stroke: #aaa;
+      stroke-dasharray: 5;
+    }
+  }
+}
+
 // .root {
 //   // background: #ccc;
 //   // padding: 10px 0;

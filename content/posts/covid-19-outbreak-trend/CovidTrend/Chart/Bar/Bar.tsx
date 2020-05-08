@@ -1,8 +1,10 @@
 import React, { useMemo, useEffect, useRef } from 'react';
 import { scaleLinear } from 'd3-scale';
+import cx from 'classnames';
 import styles from './Bar.module.scss';
 
 interface IBarProps {
+  colorMode: string;
   barLeft: number;
   barMaxWidth: number;
   count: number;
@@ -23,6 +25,8 @@ const KOR_COLOR = 'rgb(0,77,204)';
 const KOR_FILL_COLOR = 'rgba(0,77,204,0.35)';
 const COLOR = 'rgb(35,33,41)';
 const FILL_COLOR = 'rgba(64,64,64,0.1)';
+const COLOR_DARK = '#ddd';
+const FILL_COLOR_DARK = 'rgba(192,192,192,0.35)';
 const COUNTRY_WIDTH = 120;
 const FONT_SIZE = 16;
 const PADDING = 8;
@@ -31,6 +35,7 @@ const PADDING = 8;
  * Component Description
  */
 function Bar({
+  colorMode,
   barLeft,
   barMaxWidth,
   count,
@@ -47,11 +52,7 @@ function Bar({
   const flagSize = height * 1.1;
   const barTop = (height - BAR_HEIGHT) / 2;
   const baseline = height / 2 + 1;
-  const barWidth = useMemo(() => (barMaxWidth * count) / maxCount, [
-    barMaxWidth,
-    count,
-    maxCount,
-  ]);
+  const barWidth = useMemo(() => (barMaxWidth * count) / maxCount, [barMaxWidth, count, maxCount]);
 
   const rootRef = useRef<any>();
   const textRef = useRef<any>();
@@ -60,19 +61,14 @@ function Bar({
   useEffect(() => {
     const from = new Date().valueOf();
     const to = from + interval;
-    const scaled = scaleLinear()
-      .domain([from, to])
-      .range([countRef.current, count])
-      .clamp(true);
+    const scaled = scaleLinear().domain([from, to]).range([countRef.current, count]).clamp(true);
 
     let raf: number;
     const updateCount = () => {
       const now = new Date().valueOf();
       countRef.current = ~~scaled(now);
       if (textRef.current) {
-        textRef.current.textContent = Number(
-          ~~countRef.current,
-        ).toLocaleString();
+        textRef.current.textContent = Number(~~countRef.current).toLocaleString();
       }
       if (now < to) {
         requestAnimationFrame(updateCount);
@@ -95,38 +91,40 @@ function Bar({
 
   // const strokeColor = iso2 ==='KR'? KOR_COLOR : COLOR;
   // const fillColor = iso2 ==='KR'? KOR_FILL_COLOR : FILL_COLOR;
-  const strokeColor = COLOR;
-  const fillColor = FILL_COLOR;
+
+  const [strokeColor, fillColor] = useMemo(() => {
+    return colorMode === 'dark' ? [COLOR_DARK, FILL_COLOR_DARK] : [COLOR, FILL_COLOR];
+  }, [colorMode]);
 
   return (
     <g
       ref={rootRef}
-      className={styles.root}
+      className={cx(styles.root, colorMode === 'dark' && styles.dark)}
       style={{ transform: `translateY(${rank * height}px)` }}
     >
-      <g className={styles.bar} 
-      style={{ transform: `translate(${barLeft}px, ${barTop}px)` }}
-      >
+      <g className={styles.bar} style={{ transform: `translate(${barLeft}px, ${barTop}px)` }}>
         {/* <!-- bar --> */}
-        <path
-          d={`M0 0 l${barWidth} 0 l0 ${BAR_HEIGHT} l${barWidth * -1} 0 Z`}
+        <rect
+          x={0}
+          y={0}
+          width={barWidth}
+          height={BAR_HEIGHT}
+          // d={`M0 0 l${barWidth} 0 l0 ${BAR_HEIGHT} l${barWidth * -1} 0 Z`}
           stroke={strokeColor}
           fill={fillColor}
         />
         {/* <!-- count --> */}
         <g style={{ transform: `translateX(${barWidth}px)` }}>
-        <text
-          ref={textRef}
-          className={styles.count}
-          
-          x={textAnchor === 'end' ? -PADDING: PADDING}
-          y={baseline - barTop}
-          fontSize={FONT_SIZE}
-          textAnchor={textAnchor}
-          alignmentBaseline="middle"
-          fill={strokeColor}
-          
-        />
+          <text
+            ref={textRef}
+            className={styles.count}
+            x={textAnchor === 'end' ? -PADDING : PADDING}
+            y={baseline - barTop}
+            fontSize={FONT_SIZE}
+            textAnchor={textAnchor}
+            alignmentBaseline="middle"
+            fill={strokeColor}
+          />
         </g>
       </g>
       <g className={styles.label}>
