@@ -3,16 +3,16 @@
 //   padding: 10px;
 // }
 
-$duration: 1s;
+$duration: 0.5s;
 
 .animate {
-  transition: all $duration;
+  transition: all $duration linear;
 
   .bar {
     rect,
     text,
     g {
-      transition: all $duration;
+      transition: all $duration linear;
       font-family: 'Source Sans Pro';
     }
   }

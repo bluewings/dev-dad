@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale';
 import { format } from 'date-fns';
 import styles from './Summary.module.scss';
 import cx from 'classnames';
+import { PlayCircleFilled } from '@ant-design/icons';
 
 interface ISummaryProps {
   /**
@@ -83,8 +84,9 @@ function Summary({ colorMode, date, totalCount: count, interval, viewBoxWidth, v
         // transform={`translate(${barWidth}, 0)`}
         // x={PADDING}
         // y={baseline - barTop}
-        x={viewBoxWidth - 3}
-        y={viewBoxHeight - fontSize - 8}
+        // x={viewBoxWidth - 3 - 32}
+        x={viewBoxWidth - 42}
+        y={viewBoxHeight - fontSize - 15}
         fontSize={32}
         // textAnchor=""
         textAnchor="end"

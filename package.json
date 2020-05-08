@@ -23,11 +23,13 @@
     "test": "echo \"Write tests! -> https://gatsby.app/unit-testing\""
   },
   "dependencies": {
+    "@ant-design/icons": "^4.1.0",
+    "antd": "^4.2.0",
     "bootstrap": "^4.4.1",
     "d3": "^5.15.1",
     "d3-scale": "^3.2.1",
     "gatsby": "^2.20.12",
-    "gatsby-plugin-bluewings": "^0.3.61",
+    "gatsby-plugin-bluewings": "^0.3.62",
     "gatsby-plugin-google-analytics": "^2.2.2",
     "gatsby-plugin-manifest": "^2.3.3",
     "gatsby-plugin-sitemap": "^2.3.1",
