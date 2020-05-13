@@ -104,19 +104,42 @@ function usePlayRecords() {
   // console.log({ values, loading, error });
 
   return useMemo(() => {
-    // return (values || []).sort(compareRecord).slice(0, 5);
-    // return (values || []);
-    return [
-      values &&
-        values.slice(0, 6).map((e) => {
+    let records;
+    if (values) {
+      const _values = [...values].map((e: any, _i) => ({ ...e, _i }));
+
+      const players = Object.values(
+        _values.reduce((accum: any, e: any) => {
+          if (accum[e.player] && accum[e.player].record < e.record) {
+            return accum;
+          }
+          return { ...accum, [e.player]: e };
+        }, {}),
+      );
+
+      const topPlayers = [...players]
+        .sort((a: any, b: any) => {
+          if (a.record === b.record) {
+            return 0;
+          }
+          return a.record < b.record ? -1 : 1;
+        })
+        .slice(0, 6)
+        .map((e: any) => e._i);
+
+      records = _values
+        .filter((e: any, i: number, arr: any[]) => {
+          return topPlayers.includes(i);
+        })
+        .map((e: any) => {
           return {
             ...e,
             id: Math.random().toString(36).substr(-8),
           };
-        }),
-      loading,
-      error,
-    ];
+        });
+    }
+
+    return [records, loading, error];
   }, [values, loading, error]);
 
   // return
