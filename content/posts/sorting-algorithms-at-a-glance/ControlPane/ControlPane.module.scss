@@ -1,0 +1,21 @@
+.root {
+  // background: #9e9e88;
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 2rem;
+  // width: 32px;
+  // height: 32px;
+  // opacity: 0.5;
+  line-height: 0;
+  display: flex;
+  justify-content: flex-end;
+  :global(.ant-btn) {
+    font-family: 'Open Sans', 'Gothic A1', 'Apple SD Gothic NEO', helvetica, sans-serif;
+    font-size: 1rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    color: var(--theme-ui-colors-text);
+  }
+}

@@ -1,0 +1,56 @@
+.root {
+  // background: #fde773;
+  // padding: 10px;
+}
+
+.item {
+  transition: transform 1000ms ease-in-out;
+  > rect,
+  text {
+    transition: y 1000ms ease-in-out;
+  }
+
+  &.restore {
+    transition: 500ms transform ease-in-out;
+    > rect,
+    text {
+      transition: 500ms y ease-in-out;
+    }
+  }
+  .bar {
+    stroke: #333;
+    stroke-width: 1;
+    fill: none;
+  }
+  &.done {
+    .bar {
+      fill: lightblue;
+    }
+  }
+  &.compare {
+    .bar {
+      fill: yellow;
+    }
+  }
+  &.swap {
+    .bar {
+      fill: orange;
+    }
+  }
+  &.indexMin {
+    .bar {
+      fill: lightgreen;
+    }
+  }
+
+  &.temp {
+    transition: 500ms 500ms transform ease-in-out !important;
+    > rect,
+    text {
+      transition: 500ms y ease-in-out;
+    }
+    .bar {
+      fill: lightyellow;
+    }
+  }
+}

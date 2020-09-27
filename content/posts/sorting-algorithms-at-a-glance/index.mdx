@@ -1,0 +1,299 @@
+---
+title: 한눈에 보는 단순 정렬 알고리즘
+date: "2020-09-27T04:57:10.843Z"
+max_width: 50rem
+excerpt: 제너레이터를 사용하여 대표적인 단순 정렬 알고리즘들을 시각화하였습니다.
+---
+
+import { Context, Code, CodeWave } from 'gatsby-plugin-bluewings';
+import ControlPane from './ControlPane';
+import Sorter from './Sorter';
+
+[](@context)
+
+<Context>
+  {({ value, setValue }) => {
+    const { states } = value;
+    const handleStateChange = ({ pause, speed, numbers }) => {
+      setValue('pause', pause);
+      setValue('speed', speed);
+      setValue('numbers', numbers);
+    };
+    return <ControlPane states={states} onStateChange={handleStateChange} />;
+  }}
+</Context>
+
+[](@grid-4,layoutFixed)
+
+<h2 style={{ textAlign: 'center '}}>버블 정렬</h2>
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, 'bubble': state });
+    };
+    return <div style={{ height: 200 }}>
+      {numbers && <Sorter algorithm="bubble" height={200} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@grid-4,layoutFixed)
+
+<h2 style={{ textAlign: 'center '}}>선택 정렬</h2>
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, 'selection': state });
+    };
+    return <div style={{ height: 200, marginBottom: '2rem' }}>
+      {numbers && <Sorter algorithm="selection" height={200} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@grid-4,layoutFixed)
+
+<h2 style={{ textAlign: 'center '}}>삽입 정렬</h2>
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, 'insertion': state });
+    };
+    return <div style={{ height: 200, marginBottom: '2rem' }}>
+      {numbers && <Sorter algorithm="insertion" height={200} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@gridend)
+
+---
+
+## 버블 정렬 <small>bubble sort</small>
+
+서로 인접한 두 원소를 검사하여 정렬하는 알고리즘으로, 인접한 2개의 레코드를 비교하여 크기가 순서대로 되어 있지 않으면 서로 교환한다.
+
+[](@grid,layoutFixed)
+
+```javascript
+function bubbleSort(arr: number[]) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 1; j < arr.length - i; j++) {
+      if (arr[j] < arr[j - 1]) {
+        const temp = arr[j - 1];
+        arr[j - 1] = arr[j];
+        arr[j] = temp;
+      }
+    }
+  }
+  return arr;
+}
+```
+
+[](@grid,layoutFixed)
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, '_bubble': state });
+    };
+    return <div style={{ padding: '1rem 0' }}>
+      {numbers && <Sorter algorithm="bubble" height={280} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@gridend)
+
+## 선택 정렬 <small>selection sort</small>
+
+제자리 정렬 알고리즘의 하나로, 다음과 같은 순서로 이루어진다.
+
+1. 주어진 리스트 중에 최솟값을 찾는다.
+2. 그 값을 맨 앞에 위치한 값과 교체한다.
+3. 맨 처음 위치를 뺀 나머지 리스트를 같은 방법으로 교체한다.
+
+[](@grid,layoutFixed)
+
+```javascript
+function selectionSort(arr: number[]) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    let indexMin = i;
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[j] < arr[indexMin]) {
+        indexMin = j;
+      }
+    }
+    const temp = arr[indexMin];
+    arr[indexMin] = arr[i];
+    arr[i] = temp;
+  }
+  return arr;
+}
+```
+
+[](@grid,layoutFixed)
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, '_selection': state });
+    };
+    return <div style={{ padding: '1rem 0' }}>
+      {numbers && <Sorter algorithm="selection" height={280} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@gridend)
+
+## 삽입 정렬 <small>insertion sort</small>
+
+자료 배열의 모든 요소를 앞에서부터 차례대로 이미 정렬된 배열 부분과 비교하여, 자신의 위치를 찾아 삽입함으로써 정렬을 완성한다. 손안의 카드를 정렬하는 방법과 유사하다.
+
+[](@grid,layoutFixed)
+
+```javascript
+function insertionSort(arr: number[]) {
+  for (let index = 1; index < arr.length; index++) {
+    let temp = arr[index];
+    let aux = index - 1;
+    while (aux >= 0 && arr[aux] > temp) {
+      arr[aux + 1] = arr[aux];
+      aux--;
+    }
+    arr[aux + 1] = temp;
+  }
+  return arr;
+}
+```
+
+[](@grid,layoutFixed)
+
+<Context>
+  {({ value, setValue }) => {
+    const { pause, speed, numbers, states } = value;
+    const handleStateChange = (state) => {
+      setValue('states', { ...states, '_insertion': state });
+    };
+    return <div style={{ padding: '1rem 0' }}>
+      {numbers && <Sorter algorithm="insertion" height={280} values={numbers} pause={pause} speed={speed} onStateChange={handleStateChange} />}
+    </div>;
+  }}
+</Context>
+
+[](@gridend)
+
+
+
+---
+
+## 시각화 구현
+
+정렬 함수들은 동기적으로 처리되기 때문에 실시간으로 변화하는 함수의 실행을 시각화할 수 없습니다.
+위의 정렬 예제들은 [제너레이터](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/function*)를 사용하여 비동기적인 방식으로 동작할 수 있도록 변환 과정을 거쳤습니다.
+
+<CodeWave>
+
+```javascript
+function bubbleSort(arr: number[]) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 1; j < arr.length - i; j++) {
+      if (arr[j] < arr[j - 1]) {
+        const temp = arr[j - 1];
+        arr[j - 1] = arr[j];
+        arr[j] = temp;
+      }
+    }
+  }
+  return arr;
+}
+```
+
+
+### 정렬 함수
+
+기본이 되는 버블 정렬 함수입니다. 다른 정렬 함수도 방법은 동일합니다.
+
+```javascript
+function* bubbleSort(arr: number[]) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 1; j < arr.length - i; j++) {
+      if (arr[j] < arr[j - 1]) {
+        const temp = arr[j - 1];
+        arr[j - 1] = arr[j];
+        arr[j] = temp;
+      }
+    }
+  }
+  return arr;
+}
+```
+
+### function*
+
+`function*` 선언으로 제너레이터 함수로 변경합니다.
+
+```javascript
+function* bubbleSort(arr: number[]) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 1; j < arr.length - i; j++) {
+      yield { type: 'compare', payload: [j, j - 1] };
+      if (arr[j] < arr[j - 1]) {
+        const temp = arr[j - 1];
+        arr[j - 1] = arr[j];
+        arr[j] = temp;
+        yield { type: 'swap', payload: [j, j - 1] };
+      }
+    }
+  }
+  return arr;
+}
+```
+
+### yield
+
+실행을 일시 중지하고 상태를 표시해야 하는 지점에 `yield` 키워드를 사용하여 상태를 전달합니다.
+
+예제에서는 비교, 교체 시점에 일시 중지하면서 정보를 전달합니다.
+
+```javascript
+function* bubbleSort(arr: number[]) {
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 1; j < arr.length - i; j++) {
+      yield { type: 'compare', payload: [j, j - 1] };
+      if (arr[j] < arr[j - 1]) {
+        const temp = arr[j - 1];
+        arr[j - 1] = arr[j];
+        arr[j] = temp;
+        yield { type: 'swap', payload: [j, j - 1] };
+      }
+    }
+  }
+  return arr;
+}
+
+async function main(numbers) {
+  const operators = bubbleSort(numbers);
+  for (const operator of operators) {
+    await visualize(operator);
+  }
+}
+
+main([1, 5, 2, 4, 3]);
+
+```
+
+### for ... of iterable
+
+정렬이 종료될 때까지 필요한 시점에 상태를 전달받아 화면에 표시하고 일정 시간 지연 후 다음으로 진행할 수 있습니다.
+
+</CodeWave>
