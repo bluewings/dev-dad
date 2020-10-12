@@ -9678,6 +9678,11 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+korean-regexp@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/korean-regexp/-/korean-regexp-1.0.5.tgz#396eef91bb4dfb0b0f5a62eb7791a95ff3bc9098"
+  integrity sha512-uHgiMUP6yFP9l27OuDzoUOhiz29YextaJKcbf4Yqwm8d3sWKRjt4zr+tJnzgyoRqeDz0SkLJ9UqMou8iNK6drg==
+
 last-call-webpack-plugin@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/last-call-webpack-plugin/-/last-call-webpack-plugin-3.0.0.tgz#9742df0e10e3cf46e5c0381c2de90d3a7a2d7555"
