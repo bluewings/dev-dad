@@ -3,6 +3,7 @@ import { Menu, Dropdown, Input, Tooltip } from 'antd';
 import { getRegExp } from 'korean-regexp';
 import { useMeasure } from 'react-use';
 import styles from './Demo.module.scss';
+import Code from 'gatsby-plugin-bluewings/src/components/Code';
 import GridRow from 'gatsby-plugin-bluewings/src/components/Grid/Row';
 import GridColumn from 'gatsby-plugin-bluewings/src/components/Grid/Column';
 import { Styled } from 'theme-ui';
@@ -56,12 +57,16 @@ function Demo() {
     value,
   };
 
-  const regexp = useMemo(
-    () =>
+  const [regexp, regexp_] = useMemo(
+    () => [
       getRegExp(value, {
         ignoreSpace: true,
         initialSearch: true,
       }),
+      getRegExp(value, {
+        initialSearch: true,
+      }),
+    ],
     [value],
   );
 
@@ -83,6 +88,9 @@ function Demo() {
               </Dropdown>
             )}
           </div>
+          <div style={{ padding: '0 21px' }}>
+            <Code language="javascript" codeString={`t.indexOf('${value}') !== -1`} />
+          </div>
         </GridColumn>
         <GridColumn {...columnProps} >
           <Styled.h3 style={{ marginTop: 0 }}>기대한 결과</Styled.h3>
@@ -95,6 +103,9 @@ function Demo() {
                 <div />
               </Dropdown>
             )}
+          </div>
+          <div style={{ padding: '0 21px' }}>
+            <Code language="javascript" codeString={`t.search(/${regexp_.source}/) !== -1`} />
           </div>
         </GridColumn>
       </GridRow>
