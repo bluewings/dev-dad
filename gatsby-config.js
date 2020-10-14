@@ -59,5 +59,6 @@ module.exports = {
     //     icons: [],
     //   },
     // },
+    'gatsby-plugin-feed-mdx',
   ],
 };
