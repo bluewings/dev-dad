@@ -934,13 +934,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.11.2":
-  version "7.11.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.11.2.tgz#f549c13c754cc40b87644b9fa9f09a6a95fe0736"
-  integrity sha512-TeWkU52so0mPtDcaCTxNBI/IHiz0pZgr8VEFqXFtZWpYD08ZB6FaSwVAS8MKRQAP3bYKiVjwysOJgMFY28o6Tw==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/standalone@^7.9.6":
   version "7.9.6"
   resolved "https://registry.yarnpkg.com/@babel/standalone/-/standalone-7.9.6.tgz#7a5f82c6fa29959b12f708213be6de8ec0b79338"
@@ -5110,9 +5103,9 @@ decamelize@^1.1.2, decamelize@^1.2.0:
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
 decode-uri-component@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
-  integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
 
 decompress-response@^3.2.0, decompress-response@^3.3.0:
   version "3.3.0"
@@ -7047,17 +7040,6 @@ gatsby-plugin-feed@^2.5.1:
   integrity sha512-pt3sQBIgMVhKkJ+oNpYa4D2VJUfJkvjjpPVv+hpYeVsUmTpycDL1eZBVxm91OGn8qppzrwKGnmaT8R6ri0qaag==
   dependencies:
     "@babel/runtime" "^7.9.6"
-    "@hapi/joi" "^15.1.1"
-    fs-extra "^8.1.0"
-    lodash.merge "^4.6.2"
-    rss "^1.2.2"
-
-gatsby-plugin-feed@^2.5.14:
-  version "2.5.14"
-  resolved "https://registry.yarnpkg.com/gatsby-plugin-feed/-/gatsby-plugin-feed-2.5.14.tgz#ca46a11b06d7240e0199185c5c30deaed3a118e9"
-  integrity sha512-fMbTpuv1ekL2RU7KGk2o+hc/DGGbAO7kthiM/a8gxT1CqGYh5O6ma9jtqWR1FlTi95gYaWPYiPCyGcIbYurkQA==
-  dependencies:
-    "@babel/runtime" "^7.11.2"
     "@hapi/joi" "^15.1.1"
     fs-extra "^8.1.0"
     lodash.merge "^4.6.2"
